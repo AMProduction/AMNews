@@ -8,8 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.Format;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import com.amproduction.amnews.model.News;
 
@@ -70,7 +73,7 @@ public class DBManager {
 	public ObservableList<News> getData() throws SQLException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
-		Statement stmt = null; 
+		Statement stmt = null;
 		
 		boolean isConnected = getConnectionStatus();
 		if (isConnected)
@@ -87,7 +90,7 @@ public class DBManager {
 				String textNews = rs.getString("text_news");
 				LocalDateTime createdDate = rs.getTimestamp("created_date").toLocalDateTime();
 				LocalDateTime lastModifiedDate = rs.getTimestamp("last_modified_date").toLocalDateTime();
-					
+
 				newsData.add(new News(id, subject, textPresenter, textNews, createdDate, lastModifiedDate));
 			}
 				
