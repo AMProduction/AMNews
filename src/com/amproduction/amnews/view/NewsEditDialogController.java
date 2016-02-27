@@ -54,35 +54,52 @@ public class NewsEditDialogController
 	{
 		LocalDateTime createdDate = LocalDateTime.now();
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
-				
-		News news = new News(subjectTextArea.getText(), textPresenterTextArea.getText(), 
-				textNewsTextArea.getText(), createdDate, lastModifiedDate);
-		try
-		{
-			instanceDBManager.addRecord(news);
-		}
-		catch (SQLException e)
+
+		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
+				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(dialogStage);
-            alert.setTitle("AMNews");
-            alert.setHeaderText("Error adding records to the database");
-            alert.setContentText("Check database connection\n"
-            		+ "Check the correctness of data\n"
-            		+ "The data is not recorded in the database");
+			alert.setTitle("AMNews");
+			alert.setHeaderText("Порожні поля");
+			alert.setContentText("Поле теми і/або тексту новини не може бути порожнім!");
 
-            alert.showAndWait();
+			alert.showAndWait();
 		}
-		
-		controller.clearAndRefresh();
-		dialogStage.close();
+		else
+		{
+			News news = new News(subjectTextArea.getText(), textPresenterTextArea.getText(),
+					textNewsTextArea.getText(), createdDate, lastModifiedDate);
+			try
+			{
+				instanceDBManager.addRecord(news);
+			}
+			catch (SQLException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.initOwner(dialogStage);
+				alert.setTitle("AMNews");
+				alert.setHeaderText("Помилка додавання запису");
+				alert.setContentText("Перевірте з\'єднання з базою даних\n"
+					+ "Перевірте правльність даних\n"
+					+ "Дані не збережені !");
+
+				alert.showAndWait();
+			}
+
+			controller.clearAndRefresh();
+			dialogStage.close();
+		}
 	}
 	
 	public void setText (News aNews)
 	{
-		subjectTextArea.setText(aNews.getSubject());
-		textPresenterTextArea.setText(aNews.getTextPresenter());
-		textNewsTextArea.setText(aNews.getTextNews());
+		if (aNews != null)
+		{
+			subjectTextArea.setText(aNews.getSubject());
+			textPresenterTextArea.setText(aNews.getTextPresenter());
+			textNewsTextArea.setText(aNews.getTextNews());
+		}
 	}
 	
 	public void setNews (News aNews)
@@ -94,30 +111,41 @@ public class NewsEditDialogController
 	private void handleUpdateNews()
 	{
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
-		
-		News updateNews = new News(this.news.getId(), subjectTextArea.getText(),
-				textPresenterTextArea.getText(), textNewsTextArea.getText(),
-				this.news.getCreatedDate(), lastModifiedDate);
-		
-		try
-		{
-			instanceDBManager.updateRecord(updateNews);
-		}
-		catch (SQLException e)
+
+		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
+				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(dialogStage);
-            alert.setTitle("AMNews");
-            alert.setHeaderText("Failed to update records in the database");
-            alert.setContentText("Check database connection\n"
-            		+ "Check the correctness of data\n"
-            		+ "The data is not updated in the database");
+			alert.setTitle("AMNews");
+			alert.setHeaderText("Порожні поля");
+			alert.setContentText("Поле теми і/або тексту новини не може бути порожнім !");
 
-            alert.showAndWait();
+			alert.showAndWait();
 		}
-		
-		controller.clearAndRefresh();
-		dialogStage.close();
+		else {
+
+			News updateNews = new News(this.news.getId(), subjectTextArea.getText(),
+					textPresenterTextArea.getText(), textNewsTextArea.getText(),
+					this.news.getCreatedDate(), lastModifiedDate);
+
+			try {
+				instanceDBManager.updateRecord(updateNews);
+			} catch (SQLException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.initOwner(dialogStage);
+				alert.setTitle("AMNews");
+				alert.setHeaderText("Помилка оновлення запису");
+				alert.setContentText("Перевірте з\'єднання з базою даних\n"
+						+ "Перевірте правльність даних\n"
+						+ "Дані не збережені !");
+
+				alert.showAndWait();
+			}
+
+			controller.clearAndRefresh();
+			dialogStage.close();
+		}
 	}
 	
 	public void setSaveButtonOff()

@@ -48,7 +48,7 @@ public class NewsOverviewController {
 		boolean stat = instanceDBManager.getConnectionStatus();
 		if (stat) 
 		{
-			connectionStatusLabel.setText("Connected");
+			connectionStatusLabel.setText("Під\'єднано");
 		}
 		
     }
@@ -104,10 +104,10 @@ public class NewsOverviewController {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.initOwner(mainApp.getPrimaryStage());
 	            alert.setTitle("AMNews");
-	            alert.setHeaderText("Error deleting records in the database");
-	            alert.setContentText("Check database connection\n"
-	            		+ "Check the correctness of data\n"
-	            		+ "The data is not deleted in the database");
+	            alert.setHeaderText("Помилка видалення запису");
+	            alert.setContentText("Перевірте з\'єднання з базою даних\n"
+	            		+ "Перевірте правльність даних\n"
+	            		+ "Дані не видалені з бази даних");
 	
 	            alert.showAndWait();
 			}
@@ -119,9 +119,9 @@ public class NewsOverviewController {
 			// Nothing selected.
 	        Alert alert = new Alert(AlertType.WARNING);
 	        alert.initOwner(mainApp.getPrimaryStage());
-	        alert.setTitle("No Selection");
-	        alert.setHeaderText("No news selected");
-	        alert.setContentText("Please select a news in the table.");
+	        alert.setTitle("AMNews");
+	        alert.setHeaderText("Новина не вибрана");
+	        alert.setContentText("Будь ласка, виберіть новину зі списку");
 
 	        alert.showAndWait();
 		}
@@ -142,9 +142,9 @@ public class NewsOverviewController {
 			// Nothing selected.
 	        Alert alert = new Alert(AlertType.WARNING);
 	        alert.initOwner(mainApp.getPrimaryStage());
-	        alert.setTitle("No Selection");
-	        alert.setHeaderText("No news selected");
-	        alert.setContentText("Please select a news in the table.");
+	        alert.setTitle("AMNews");
+	        alert.setHeaderText("Не вибрана новина");
+	        alert.setContentText("Будь ласка, виберіть новину зі списку");
 
 	        alert.showAndWait();
 		}
@@ -156,38 +156,46 @@ public class NewsOverviewController {
 	{		
 		ObservableList<News> newsData = FXCollections.observableArrayList();    
 		LocalDate date = datePicker.getValue();
+		LocalDate dateNow = LocalDate.now();
+
 		if (date != null)
 		{			
-			try
-			{
-				newsData = instanceDBManager.filter(date);
-			}
-			 
-			catch (SQLException e)
-			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.initOwner(mainApp.getPrimaryStage());
-				alert.setTitle("AMNews");
-				alert.setHeaderText("Error working with database");
-				alert.setContentText("Check database connection");
-	
-		        alert.showAndWait();
-			}
-			
-			if (newsData.isEmpty())
+			if (date.isAfter(dateNow))
 			{
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.initOwner(mainApp.getPrimaryStage());
 				alert.setTitle("AMNews");
-				alert.setHeaderText("No data found");
-				alert.setContentText("Select another date");
-	
-		        alert.showAndWait();
+				alert.setHeaderText("Дата з майбутнього");
+				alert.setContentText("Виберіть іншу дату");
+
+				alert.showAndWait();
 			}
-			else
-			{
-				mainApp.clearAndGetData();
-				newsTable.setItems(newsData);
+			else {
+
+				try {
+					newsData = instanceDBManager.filter(date);
+				} catch (SQLException e) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.initOwner(mainApp.getPrimaryStage());
+					alert.setTitle("AMNews");
+					alert.setHeaderText("Помилка роботи з базою даних");
+					alert.setContentText("Перевірте з\'єднання з базою даних");
+
+					alert.showAndWait();
+				}
+
+				if (newsData.isEmpty()) {
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.initOwner(mainApp.getPrimaryStage());
+					alert.setTitle("AMNews");
+					alert.setHeaderText("Дані не знайдені");
+					alert.setContentText("Виберіть іншу дату");
+
+					alert.showAndWait();
+				} else {
+					mainApp.clearAndGetData();
+					newsTable.setItems(newsData);
+				}
 			}
 		
 		}
@@ -196,8 +204,8 @@ public class NewsOverviewController {
 			Alert alert = new Alert(AlertType.WARNING);
 			alert.initOwner(mainApp.getPrimaryStage());
 			alert.setTitle("AMNews");
-			alert.setHeaderText("No date selected");
-			alert.setContentText("The operation could not be performed");
+			alert.setHeaderText("Дата не вибрана");
+			alert.setContentText("Операція не може бути здійснена");
 
 			alert.showAndWait();
 		}

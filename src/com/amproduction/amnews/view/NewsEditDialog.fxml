@@ -14,15 +14,15 @@
          <bottom>
             <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <buttons>
-                <Button fx:id="updateButton" mnemonicParsing="false" onAction="#handleUpdateNews" text="Update" />
-                  <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSaveNews" text="Save" />
+                <Button fx:id="updateButton" mnemonicParsing="false" onAction="#handleUpdateNews" text="Оновити" />
+                  <Button fx:id="saveButton" mnemonicParsing="false" onAction="#handleSaveNews" text="Зберегти" />
                </buttons>
             </ButtonBar>
          </bottom>
          <center>
             <TabPane prefHeight="600.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
               <tabs>
-                <Tab text="Subject">
+                <Tab text="Тема">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -31,7 +31,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Presenter text">
+                <Tab text="Підводка">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -40,7 +40,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                  <Tab text="News text">
+                  <Tab text="Текст новини">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>

@@ -8,43 +8,39 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.amproduction.amnews.view.NewsOverviewController">
    <children>
       <BorderPane prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
-            <Label fx:id="connectionStatusLabel" prefHeight="42.0" prefWidth="448.0" text="No Database connection" BorderPane.alignment="CENTER">
+            <Label fx:id="connectionStatusLabel" prefHeight="42.0" prefWidth="568.0" text="Немає з'єднання з базою даних" BorderPane.alignment="CENTER">
                <graphic>
-                  <ButtonBar prefHeight="83.0" prefWidth="295.0">
+                  <ButtonBar prefHeight="83.0" prefWidth="364.0">
                     <buttons>
-                      <Button mnemonicParsing="false" onAction="#handleNewNews" text="New" />
-                        <Button mnemonicParsing="false" onAction="#handleEditNews" text="Edit" />
-                        <Button mnemonicParsing="false" onAction="#handleDeleteNews" text="Delete" />
+                      <Button mnemonicParsing="false" onAction="#handleNewNews" text="Додати" />
+                        <Button mnemonicParsing="false" onAction="#handleEditNews" text="Редагувати" />
+                        <Button mnemonicParsing="false" onAction="#handleDeleteNews" text="Видалити" />
                     </buttons>
                   </ButtonBar>
                </graphic></Label>
          </bottom>
          <center>
-            <TableView fx:id="newsTable" prefHeight="379.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+            <TableView fx:id="newsTable" prefHeight="518.0" prefWidth="0.0" BorderPane.alignment="CENTER">
               <columns>
-                <TableColumn fx:id="idColumn" prefWidth="115.0" text="Id" />
-                <TableColumn fx:id="subjectColumn" prefWidth="319.0" text="Subject" />
-                  <TableColumn fx:id="lastModifiedDateColumn" prefWidth="69.0" text="Last modified" />
+                <TableColumn fx:id="idColumn" prefWidth="73.0" text="№" />
+                <TableColumn fx:id="subjectColumn" prefWidth="452.0" text="Тема" />
+                  <TableColumn fx:id="lastModifiedDateColumn" prefWidth="274.0" text="Востаннє редаговано" />
               </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
             </TableView>
          </center>
          <top>
-            <Pane prefHeight="38.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-               <children>
-                  <DatePicker fx:id="datePicker" layoutX="471.0" layoutY="8.0" prefHeight="25.0" prefWidth="193.0" promptText="Choose date" />
-                  <Button layoutX="729.0" layoutY="9.0" mnemonicParsing="false" onAction="#clearAndRefresh" text="Reset" />
-                  <Button disable="true" layoutX="674.0" layoutY="9.0" mnemonicParsing="false" onAction="#newsDateFilter" text="Filter" />
-               </children>
-            </Pane>
+            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <buttons>
+                  <DatePicker fx:id="datePicker" prefHeight="25.0" prefWidth="193.0" promptText="Виберіть дату" />
+                  <Button disable="true" mnemonicParsing="false" onAction="#newsDateFilter" text="Пошук" />
+                  <Button mnemonicParsing="false" onAction="#clearAndRefresh" text="Скинути" />
+              </buttons>
+            </ButtonBar>
          </top>
       </BorderPane>
    </children>

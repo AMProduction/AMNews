@@ -26,8 +26,8 @@ public class RootLayoutController {
 	{
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("AMNews");
-        alert.setHeaderText("About");
-        alert.setContentText("Author: A.Malchyk");
+        alert.setHeaderText("Про продукт");
+        alert.setContentText("Автор: А.В.Мальчик");
 
         alert.showAndWait();
     }

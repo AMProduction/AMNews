@@ -203,9 +203,9 @@ public class MainApp extends Application {
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(primaryStage);
-            alert.setTitle("Error");
-            alert.setHeaderText("Failed to update table");
-            alert.setContentText("Check database connection");
+            alert.setTitle("AMNews");
+            alert.setHeaderText("Помилка оновлення таблиці");
+            alert.setContentText("Перевірте з\'єднання з базою даних");
 
             alert.showAndWait();
 		}
