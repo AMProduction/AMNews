@@ -1,5 +1,6 @@
 package com.amproduction.amnews.view;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -86,6 +87,16 @@ public class NewsEditDialogController
 
 				alert.showAndWait();
 			}
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.initOwner(dialogStage);
+				alert.setTitle("AMNews");
+				alert.setHeaderText("Помилка файлу конфігурації");
+				alert.setContentText("Перевірте наявність файлу конфігурації");
+
+				alert.showAndWait();
+			}
 
 			controller.clearAndRefresh();
 			dialogStage.close();
@@ -142,6 +153,17 @@ public class NewsEditDialogController
 
 				alert.showAndWait();
 			}
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.initOwner(dialogStage);
+				alert.setTitle("AMNews");
+				alert.setHeaderText("Помилка файлу конфігурації");
+				alert.setContentText("Перевірте наявність файлу конфігурації");
+
+				alert.showAndWait();
+			}
+
 
 			controller.clearAndRefresh();
 			dialogStage.close();

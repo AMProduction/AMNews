@@ -1,23 +1,18 @@
 package com.amproduction.amnews.util;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.Format;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-
+import com.amproduction.amnews.MainApp;
 import com.amproduction.amnews.model.News;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Properties;
 
 public class DBManager {
 	
@@ -40,22 +35,26 @@ public class DBManager {
 
 	private boolean connectionStatus = false;
 	
-	public Connection ConnectionToDB()
-	{
+	public Connection ConnectionToDB() throws IOException, SQLException {
 		Connection c = null;
-	    try
-	    {
-	    	Class.forName("org.postgresql.Driver");
-	    	c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/AMNews",
-	            "dbuser1", "1988");
+		Properties props = new Properties();
+		String[] args = MainApp.getArgs();
+
+		try (InputStream in = Files.newInputStream(Paths.get(args[0])))
+		{
+			props.load(in);
+		}
+
+		String drivers = props.getProperty("jdbc.drivers");
+		if (drivers != null)
+			System.setProperty("jdbc.drivers", drivers);
+		String url = props.getProperty("jdbc.url");
+		String username = props.getProperty("jdbc.username");
+		String password = props.getProperty("jdbc.password");
+
+		c = DriverManager.getConnection(url, username, password);
 	    	
-	    	setConnectionStatus(true);	    	
-	    }
-	    catch (Exception e)
-	    {
-	    	setConnectionStatus(false);
-	    	e.printStackTrace();    
-	    }
+		setConnectionStatus(true);
 	    
 	    return c;
 	}
@@ -70,7 +69,7 @@ public class DBManager {
 		connectionStatus = status;
 	}
 	
-	public ObservableList<News> getData() throws SQLException
+	public ObservableList<News> getData() throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
 		Statement stmt = null;
@@ -78,8 +77,9 @@ public class DBManager {
 		boolean isConnected = getConnectionStatus();
 		if (isConnected)
 		{
+
 			Connection c = ConnectionToDB();
-			
+
 			stmt = c.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM \"News\"");
 			while (rs.next())
@@ -101,7 +101,7 @@ public class DBManager {
 		return newsData;
 	}
 		
-	public void addRecord (News aNews) throws SQLException
+	public void addRecord (News aNews) throws SQLException, IOException
 	{
 		Statement stmt = null;
 		PreparedStatement stat;
@@ -130,7 +130,7 @@ public class DBManager {
 		}
 	}
 	
-	public void updateRecord (News aNews) throws SQLException
+	public void updateRecord (News aNews) throws SQLException, IOException
 	{
 		Statement stmt = null;
 		PreparedStatement stat;
@@ -161,7 +161,7 @@ public class DBManager {
 		}
 	}
 
-	public void deleteRecord (News aNews) throws SQLException
+	public void deleteRecord (News aNews) throws SQLException, IOException
 	{
 		Statement stmt = null;
 		PreparedStatement stat;
@@ -184,7 +184,7 @@ public class DBManager {
 		}
 	}
 	
-	public ObservableList<News> filter (LocalDate date) throws SQLException
+	public ObservableList<News> filter (LocalDate date) throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
 		

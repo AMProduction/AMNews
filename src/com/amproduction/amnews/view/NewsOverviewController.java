@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -111,6 +112,17 @@ public class NewsOverviewController {
 	
 	            alert.showAndWait();
 			}
+			catch (IOException e)
+			{
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.initOwner(mainApp.getPrimaryStage());
+				alert.setTitle("AMNews");
+				alert.setHeaderText("Помилка файлу конфігурації");
+				alert.setContentText("Перевірте наявність файлу конфігурації");
+
+				alert.showAndWait();
+			}
+
 			
 			clearAndRefresh();
 		}
@@ -180,6 +192,16 @@ public class NewsOverviewController {
 					alert.setTitle("AMNews");
 					alert.setHeaderText("Помилка роботи з базою даних");
 					alert.setContentText("Перевірте з\'єднання з базою даних");
+
+					alert.showAndWait();
+				}
+				catch (IOException e)
+				{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.initOwner(mainApp.getPrimaryStage());
+					alert.setTitle("AMNews");
+					alert.setHeaderText("Помилка файлу конфігурації");
+					alert.setContentText("Перевірте наявність файлу конфігурації");
 
 					alert.showAndWait();
 				}

@@ -33,12 +33,14 @@ public class MainApp extends Application {
 	DBManager instanceDBManager = DBManager.getInstance();
 	
 	private ObservableList<News> newsData = FXCollections.observableArrayList();
+
+	private static String[] aArgs;
 	
 	public MainApp()
 	{
-		Connection c = instanceDBManager.ConnectionToDB();
 		try
 		{
+			Connection c = instanceDBManager.ConnectionToDB();
 			newsData = instanceDBManager.getData();		
 		}
 		catch (SQLException e)
@@ -50,6 +52,16 @@ public class MainApp extends Application {
             alert.setContentText("Check database connection");
 
             alert.showAndWait();
+		}
+		catch (IOException e)
+		{
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.initOwner(primaryStage);
+			alert.setTitle("AMNews");
+			alert.setHeaderText("Помилка файлу конфігурації");
+			alert.setContentText("Перевірте наявність файлу конфігурації");
+
+			alert.showAndWait();
 		}
 	}
 
@@ -126,7 +138,13 @@ public class MainApp extends Application {
 	}
 
 	public static void main(String[] args) {
+		MainApp.aArgs = args;
 		launch(args);
+	}
+
+	public static String[] getArgs()
+	{
+		return aArgs;
 	}
 	
 	public ObservableList<News> getNewsData() {
@@ -208,6 +226,16 @@ public class MainApp extends Application {
             alert.setContentText("Перевірте з\'єднання з базою даних");
 
             alert.showAndWait();
+		}
+		catch (IOException e)
+		{
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.initOwner(primaryStage);
+			alert.setTitle("AMNews");
+			alert.setHeaderText("Помилка файлу конфігурації");
+			alert.setContentText("Перевірте наявність файлу конфігурації");
+
+			alert.showAndWait();
 		}
 	}
 }
