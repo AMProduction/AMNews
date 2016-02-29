@@ -1,14 +1,16 @@
 package com.amproduction.amnews.util;
 
-import com.amproduction.amnews.MainApp;
 import com.amproduction.amnews.model.News;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,9 +51,13 @@ public class DBManager {
 	public Connection ConnectionToDB() throws IOException, SQLException {
 		Connection c = null;
 		Properties props = new Properties();
-		String[] args = MainApp.getArgs();
 
-		try (InputStream in = Files.newInputStream(Paths.get(args[0])))
+		final String sFileName = "database.properties";
+		String sDirSeparator = System.getProperty("file.separator");
+		File currentDir = new File(".");
+		String sFilePath = currentDir.getCanonicalPath() + sDirSeparator + sFileName;
+
+		try (InputStream in = new FileInputStream(sFilePath))
 		{
 			props.load(in);
 		}

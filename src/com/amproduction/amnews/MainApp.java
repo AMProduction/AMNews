@@ -38,8 +38,6 @@ public class MainApp extends Application {
 	DBManager instanceDBManager = DBManager.getInstance();
 	
 	private ObservableList<News> newsData = FXCollections.observableArrayList();
-
-	private static String[] aArgs;
 	
 	public MainApp()
 	{
@@ -52,9 +50,9 @@ public class MainApp extends Application {
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(primaryStage);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error receiving data");
-            alert.setContentText("Check database connection");
+            alert.setTitle("AMNews");
+            alert.setHeaderText("Помилка отримання даних");
+            alert.setContentText("Перевірте з\'єднання з базою даних");
 
             alert.showAndWait();
 		}
@@ -143,15 +141,9 @@ public class MainApp extends Application {
 	}
 
 	public static void main(String[] args) {
-		MainApp.aArgs = args;
 		launch(args);
 	}
 
-	public static String[] getArgs()
-	{
-		return aArgs;
-	}
-	
 	public ObservableList<News> getNewsData() {
         return newsData;
     }
