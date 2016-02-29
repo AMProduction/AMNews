@@ -14,6 +14,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
+/**
+ *	@version 1.0 2016-02
+ *	@author Andrii Malchyk
+ */
+
 public class DBManager {
 	
 	private static DBManager instance;
@@ -34,7 +39,13 @@ public class DBManager {
 	 }
 
 	private boolean connectionStatus = false;
-	
+
+	/**
+	 * Зєднання з базою. Параметри підключення зчитуємо з файла
+	 * @return зєднання
+	 * @throws IOException	зчитування  з файлу
+	 * @throws SQLException	помилки роботи з базою
+     */
 	public Connection ConnectionToDB() throws IOException, SQLException {
 		Connection c = null;
 		Properties props = new Properties();
@@ -68,7 +79,13 @@ public class DBManager {
 	{
 		connectionStatus = status;
 	}
-	
+
+	/**
+	 * Зчитуємо з бази дані. Заносимо у колекцію
+	 * @return newsData ObservableList<News> колекція обєктів
+	 * @throws SQLException	помилки роботи з базою
+	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
+     */
 	public ObservableList<News> getData() throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
@@ -100,7 +117,13 @@ public class DBManager {
 		
 		return newsData;
 	}
-		
+
+	/**
+	 * Записуємо у базу новину
+	 * @param aNews	обєкт класу новина
+	 * @throws SQLException	помилки роботи з базою
+	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
+     */
 	public void addRecord (News aNews) throws SQLException, IOException
 	{
 		Statement stmt = null;
@@ -129,7 +152,13 @@ public class DBManager {
 			c.commit();
 		}
 	}
-	
+
+	/**
+	 * Оновлюємо новину у базі
+	 * @param aNews	обєкт класу новина
+	 * @throws SQLException	помилки роботи з базою
+	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
+     */
 	public void updateRecord (News aNews) throws SQLException, IOException
 	{
 		Statement stmt = null;
@@ -161,6 +190,12 @@ public class DBManager {
 		}
 	}
 
+	/**
+	 * Видаляємо новину з бази
+	 * @param aNews	обєкт класу новина
+	 * @throws SQLException	помилки роботи з базою
+	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
+     */
 	public void deleteRecord (News aNews) throws SQLException, IOException
 	{
 		Statement stmt = null;
@@ -183,7 +218,14 @@ public class DBManager {
 			c.commit();
 		}
 	}
-	
+
+	/**
+	 * Шукаємо новину у базі
+	 * @param date	дата створення новини
+	 * @return	newsData колекцію новин
+	 * @throws SQLException
+	 * @throws IOException
+     */
 	public ObservableList<News> filter (LocalDate date) throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();

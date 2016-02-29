@@ -14,6 +14,11 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ *	@version 1.0 2016-02
+ *	@author Andrii Malchyk
+ */
+
 public class NewsOverviewController {
 	@FXML
     private TableView<News> newsTable;
@@ -42,10 +47,12 @@ public class NewsOverviewController {
 	@FXML
     private void initialize()
     {	
+		//магія Java 8 і Java FX
+		//задаємо, що буде відображатись у кожному стовбчику
 		idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
 		subjectColumn.setCellValueFactory(cellData -> cellData.getValue().subjectProperty());
 		lastModifiedDateColumn.setCellValueFactory(cellData -> cellData.getValue().lastModifiedDateProperty());
-			
+		//відображаємо стан зєднання на мітці
 		boolean stat = instanceDBManager.getConnectionStatus();
 		if (stat) 
 		{
@@ -58,11 +65,15 @@ public class NewsOverviewController {
 	{
 		this.mainApp = mainApp;
 		newsTable.setItems(mainApp.getNewsData());
-		
+
+		//магія Java 8 і Java FX
+		//задаємо дію на вибір дати
 		datePicker.setOnAction(event -> {
 			newsDateFilter();
 		});
 
+		//магія Java 8 і Java FX
+		//задаємо дію на подвійний клік на новині
         newsTable.setRowFactory( tv -> {
             TableRow<News> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -73,29 +84,42 @@ public class NewsOverviewController {
             return row ;
         });
 	}
-	
+
+	/**
+	 * Обробник кнопки Додати
+	 */
 	@FXML
 	private void handleNewNews()
 	{
 		mainApp.showNewsAddDialog_NEW();
 	}
-	
+
+	/**
+	 * Обробник кнопки Скинути
+	 * Його ж юзаємо в класі NewsEditDialogController
+	 */
 	@FXML
 	public void clearAndRefresh()
 	{	
 		mainApp.clearAndGetData();
 		newsTable.setItems(mainApp.getNewsData());
 	}
-	
+
+	/**
+	 * Обробник кнопки Видалити
+	 */
 	@FXML
 	private void handleDeleteNews()
 	{	
+		//отримуємо індекс виділеного
 		int selectedIndex = newsTable.getSelectionModel().getSelectedIndex();
-		
+
+		//Якщо щось виділене
 		if (selectedIndex >= 0)
 		{
+			//отримуємо виділений елемент
 			News selectedNews = newsTable.getSelectionModel().getSelectedItem();
-		
+			//і видаляємо його
 			try
 			{
 				instanceDBManager.deleteRecord(selectedNews);
@@ -126,9 +150,9 @@ public class NewsOverviewController {
 			
 			clearAndRefresh();
 		}
+		//якщо нічого не вибрано
 		else
 		{
-			// Nothing selected.
 	        Alert alert = new Alert(AlertType.WARNING);
 	        alert.initOwner(mainApp.getPrimaryStage());
 	        alert.setTitle("AMNews");
@@ -138,20 +162,27 @@ public class NewsOverviewController {
 	        alert.showAndWait();
 		}
 	}
-	
+
+	/**
+	 * Обробник кнопки Редагувати
+	 */
 	@FXML
 	private void handleEditNews()
-	{	
+	{
+		//отримуємо індекс виділеного
 		int selectedIndex = newsTable.getSelectionModel().getSelectedIndex();
-		
+
+		//Якщо щось виділене
 		if (selectedIndex >= 0)
 		{
+			//отримуємо виділений елемент
 			News selectedNews = newsTable.getSelectionModel().getSelectedItem();
+			// і викликаємо вікно редагування, передавши туди вибрану новину
 			mainApp.showNewsAddDialog_EDIT(selectedNews);
 		}
+		//якщо нічого не вибрано
 		else
 		{
-			// Nothing selected.
 	        Alert alert = new Alert(AlertType.WARNING);
 	        alert.initOwner(mainApp.getPrimaryStage());
 	        alert.setTitle("AMNews");
@@ -162,16 +193,23 @@ public class NewsOverviewController {
 		}
 		
 	}
-	
+
+	/**
+	 * Пошук новини за датою створення
+	 */
 	@FXML
 	private void newsDateFilter()
 	{		
 		ObservableList<News> newsData = FXCollections.observableArrayList();    
+		//отримуємо дату з DatePicker
 		LocalDate date = datePicker.getValue();
+		//отримуємо сьогоднішню дату
 		LocalDate dateNow = LocalDate.now();
 
+		//Якщо юзер вибрав дату
 		if (date != null)
 		{			
+			//Якщо вибрана дата більша за теперішню
 			if (date.isAfter(dateNow))
 			{
 				Alert alert = new Alert(AlertType.INFORMATION);
@@ -182,11 +220,15 @@ public class NewsOverviewController {
 
 				alert.showAndWait();
 			}
-			else {
-
-				try {
+			else
+			{
+				//якщо з дато все ок пробуємо пошукати
+				try
+				{
 					newsData = instanceDBManager.filter(date);
-				} catch (SQLException e) {
+				}
+				catch (SQLException e)
+				{
 					Alert alert = new Alert(AlertType.ERROR);
 					alert.initOwner(mainApp.getPrimaryStage());
 					alert.setTitle("AMNews");
@@ -205,8 +247,9 @@ public class NewsOverviewController {
 
 					alert.showAndWait();
 				}
-
-				if (newsData.isEmpty()) {
+				//Якщо нічого не знайшли
+				if (newsData.isEmpty())
+				{
 					Alert alert = new Alert(AlertType.INFORMATION);
 					alert.initOwner(mainApp.getPrimaryStage());
 					alert.setTitle("AMNews");
@@ -214,13 +257,19 @@ public class NewsOverviewController {
 					alert.setContentText("Виберіть іншу дату");
 
 					alert.showAndWait();
-				} else {
+				}
+				//Якщо знайшли, то виводимо знайдене у таблицю
+				else
+				{
 					mainApp.clearAndGetData();
 					newsTable.setItems(newsData);
 				}
 			}
 		
 		}
+		//якщо дату не вибрали, а на кнопку тицнюли, чи ще якась фігня
+		//Примітка: Кнопка відключена, вручну не запустиш пошук
+		//тільки через DatePicker
 		else
 		{
 			Alert alert = new Alert(AlertType.WARNING);

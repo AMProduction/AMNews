@@ -14,6 +14,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
+/**
+ *	@version 1.0 2016-02
+ *	@author Andrii Malchyk
+ */
+
 public class NewsEditDialogController
 {
 	@FXML
@@ -50,12 +55,17 @@ public class NewsEditDialogController
 		this.controller = aController;
     }
 
+	/**
+	 * Обробник кнопки Зберегти (нова новина)
+	 */
 	@FXML
 	private void handleSaveNews()
 	{
+		//отримуємо дати створення і останнього редагування
+		//у даному методі вони співпадають
 		LocalDateTime createdDate = LocalDateTime.now();
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
-
+		//перевіряємо чи не порожні поля Теми і Тексту новини
 		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
 				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
 		{
@@ -67,6 +77,7 @@ public class NewsEditDialogController
 
 			alert.showAndWait();
 		}
+		//якщо все ОК, то зберігаємо
 		else
 		{
 			News news = new News(subjectTextArea.getText(), textPresenterTextArea.getText(),
@@ -102,7 +113,11 @@ public class NewsEditDialogController
 			dialogStage.close();
 		}
 	}
-	
+
+	/**
+	 * ініціалізуємо текстові поля
+	 * @param aNews отримуємо дані з параметра
+     */
 	public void setText (News aNews)
 	{
 		if (aNews != null)
@@ -112,17 +127,26 @@ public class NewsEditDialogController
 			textNewsTextArea.setText(aNews.getTextNews());
 		}
 	}
-	
+
+	/**
+	 * Ініціалізуємо змінну класу, щоби отримати id новини і дату створення
+	 * Потрібно для методу handleUpdateNews()
+	 * @param aNews звідси отримуємо id
+     */
 	public void setNews (News aNews)
 	{
 		this.news = aNews;
 	}
-	
+
+	/**
+	 * Обробник кнопки Оновити (редагуємо новину)
+	 */
 	@FXML
 	private void handleUpdateNews()
 	{
+		//отримуємо дату останнього редагування
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
-
+		//перевіряємо чи не порожні поля Теми і Тексту новини
 		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
 				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
 		{
@@ -134,8 +158,9 @@ public class NewsEditDialogController
 
 			alert.showAndWait();
 		}
+		//якщо все ОК
 		else {
-
+			//id та дату створення отримуємо з переданого параметра
 			News updateNews = new News(this.news.getId(), subjectTextArea.getText(),
 					textPresenterTextArea.getText(), textNewsTextArea.getText(),
 					this.news.getCreatedDate(), lastModifiedDate);
@@ -164,17 +189,23 @@ public class NewsEditDialogController
 				alert.showAndWait();
 			}
 
-
+			//оновлюємо таблицю
 			controller.clearAndRefresh();
 			dialogStage.close();
 		}
 	}
-	
+
+	/**
+	 * відключаємо кнопку Зберегти
+	 */
 	public void setSaveButtonOff()
 	{
 		saveButton.setDisable(true);
 	}
 
+	/**
+	 * відключаємо кнопку Оновити
+	 */
 	public void setUpdateButtonOff()
 	{
 		updateButton.setDisable(true);

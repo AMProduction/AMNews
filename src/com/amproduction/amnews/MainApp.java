@@ -22,6 +22,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/**
+ *	@version 1.0 2016-02
+ *	@author Andrii Malchyk
+ */
+
 public class MainApp extends Application {
 	
 	private Stage primaryStage;
@@ -105,7 +110,7 @@ public class MainApp extends Application {
 	}
 	
 	/**
-     * Shows the news overview inside the root layout.
+     * Відображаємо NewsOverview всередині RootLayout
      */
 	public void showNewsOverview()
 	{
@@ -151,6 +156,9 @@ public class MainApp extends Application {
         return newsData;
     }
 
+	/**
+	 * Показуємо вікно додавання нової новини
+	 */
 	public void showNewsAddDialog_NEW()
 	{
 		try
@@ -167,6 +175,7 @@ public class MainApp extends Application {
 	        dialogStage.setScene(scene);
 	        
 	        controllerNewsEditDialog = loader.getController();
+			//деактивовуємо кнопку Оновити
 	        controllerNewsEditDialog.setUpdateButtonOff();
 	        controllerNewsEditDialog.setNewsOverviewController(controllerNewsOverview);
 	        controllerNewsEditDialog.setDialogStage(dialogStage);
@@ -179,7 +188,11 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Показуємо вікно редгування новини
+	 * @param news передаємо обєкт у метод відображення для ініціалізації текстових полів
+     */
 	public void showNewsAddDialog_EDIT(News news)
 	{
 		try
@@ -196,9 +209,14 @@ public class MainApp extends Application {
 	        dialogStage.setScene(scene);
 	        
 	        controllerNewsEditDialog = loader.getController();
-	        controllerNewsEditDialog.setText(news);
+	        //ініціалізації текстових полів
+			controllerNewsEditDialog.setText(news);
+			//передаємо новину у контролер для отримання даних
 	        controllerNewsEditDialog.setNews(news);
+			//передаємо посилання на контролер NewsOverview
+			//щоби працювали методи з нього
 	        controllerNewsEditDialog.setNewsOverviewController(controllerNewsOverview);
+			//декативовуємо кнопку Зберегти
 	        controllerNewsEditDialog.setSaveButtonOff();
 	        controllerNewsEditDialog.setDialogStage(dialogStage);
 	        // Show the dialog and wait until the user closes it
@@ -209,7 +227,10 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Очищаємо колецію і наповнюємо її новленими даними
+	 */
 	public void clearAndGetData()
 	{
 		this.newsData.removeAll(newsData);

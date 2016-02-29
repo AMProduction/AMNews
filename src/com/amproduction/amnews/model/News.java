@@ -1,3 +1,8 @@
+/**
+ *	@version 1.0 2016-02
+ *	@author Andrii Malchyk
+ */
+
 package com.amproduction.amnews.model;
 
 import java.time.LocalDateTime;
@@ -17,6 +22,15 @@ public class News {
 	private final ObjectProperty<LocalDateTime> createdDate;
 	private final ObjectProperty<LocalDateTime> lastModifiedDate;
 
+	/**
+	 * Конструктор для створення нової новини
+	 * @param aId	номер
+	 * @param aSubject	тема новини
+	 * @param aTextPresenter	текст диктора (підводка)
+	 * @param aTextNews	текст новини
+	 * @param aCreatedDate	дата створення (незмінна)
+     * @param aLastModifiedDate	дата останньої модифікації
+     */
 	public News(int aId, String aSubject, String aTextPresenter, String aTextNews,
 			LocalDateTime aCreatedDate, LocalDateTime aLastModifiedDate)
 	{
@@ -27,7 +41,15 @@ public class News {
 		this.createdDate = new SimpleObjectProperty<>(aCreatedDate);
 		this.lastModifiedDate = new SimpleObjectProperty<>(aLastModifiedDate);
 	}
-	
+
+	/**
+	 * Конструктор для редагування існуючої новини
+	 * @param aSubject	тема новини
+	 * @param aTextPresenter текст диктора (підводка)
+	 * @param aTextNews текст новини
+	 * @param aCreatedDate дата створення (незмінна)
+	 * @param aLastModifiedDate	дата останньої модифікації
+     */
 	public News(String aSubject, String aTextPresenter, String aTextNews,
 			LocalDateTime aCreatedDate, LocalDateTime aLastModifiedDate)
 	{

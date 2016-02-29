@@ -7,6 +7,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ *	@version 1.0 2016-02
+ *	@author Andrii Malchyk
+ */
+
 public class RootLayoutController {
 	private MainApp mainApp;
 	
@@ -14,13 +19,19 @@ public class RootLayoutController {
 	{
 		this.mainApp = mainApp;
     }
-	
+
+	/**
+	 * Пункт меню Вихід
+	 */
 	@FXML
     private void handleExit()
 	{
         System.exit(0);
     }
-	
+
+	/**
+	 * Пункт меню Про
+	 */
 	@FXML
     private void handleAbout()
 	{
@@ -31,7 +42,10 @@ public class RootLayoutController {
 
         alert.showAndWait();
     }
-	
+
+	/**
+	 * Пункт меню Додати
+	 */
 	@FXML
 	private void handleNewNews()
 	{
