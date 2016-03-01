@@ -1,7 +1,9 @@
-BEGIN;
+sudo -u postgres psql
+
 CREATE ROLE dbuser1 LOGIN
-  ENCRYPTED PASSWORD 'md5f1a0c082ea45019a8ea07c0fb142e45f'
+  UNENCRYPTED PASSWORD '1988'
   SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
+
 CREATE DATABASE "AMNews"
   WITH OWNER = dbuser1
        ENCODING = 'UTF8'
@@ -9,11 +11,17 @@ CREATE DATABASE "AMNews"
        LC_COLLATE = 'uk_UA.UTF-8'
        LC_CTYPE = 'uk_UA.UTF-8'
        CONNECTION LIMIT = -1;
+
+\q
+
+psql -h localhost AMNews dbuser1
+
+BEGIN;
 CREATE SEQUENCE auto_id_news
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
-  START 24
+  START 1
   CACHE 1;
 CREATE TABLE "News"
 (
@@ -24,5 +32,7 @@ CREATE TABLE "News"
   created_date timestamp without time zone,
   last_modified_date timestamp without time zone,
   CONSTRAINT "News_pkey" PRIMARY KEY (id)
-)
+);
 COMMIT;
+
+\q
