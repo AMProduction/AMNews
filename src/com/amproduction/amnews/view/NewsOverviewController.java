@@ -57,7 +57,7 @@ public class NewsOverviewController {
 		if (stat) 
 		{
 
-			// CR: не думаю що юзеру цікаво що щось кудись підєднано :)
+			// CR: додаткова інтерактивність ? )
 			connectionStatusLabel.setText("Під\'єднано");
 		}
 		
