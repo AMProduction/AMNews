@@ -23,7 +23,7 @@ public class RootLayoutController {
 	/**
 	 * Пункт меню Вихід
 	 */
-	@FXML
+	@FXML // CR: пофіксай відступи
     private void handleExit()
 	{
         System.exit(0);
@@ -32,7 +32,7 @@ public class RootLayoutController {
 	/**
 	 * Пункт меню Про
 	 */
-	@FXML
+	@FXML // CR: пофіксай відступи
     private void handleAbout()
 	{
         Alert alert = new Alert(AlertType.INFORMATION);

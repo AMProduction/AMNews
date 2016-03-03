@@ -26,28 +26,34 @@ import javafx.stage.Stage;
  *	@version 1.0 2016-02
  *	@author Andrii Malchyk
  */
-
 public class MainApp extends Application {
-	
+
+	// CR: Використовуй відступи замість табів - забезпечить однакове відображення на різних платформах (поміняй на налаштуваннях IDE)
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
 	NewsEditDialogController controllerNewsEditDialog;
 	NewsOverviewController controllerNewsOverview;
-	
+
+	// CR: просто dbManager - важливо правильно давати імена
+	// CR: тут можна зробити static final константу INSTANCE_DB_MANAGER
 	DBManager instanceDBManager = DBManager.getInstance();
-	
+
+	// CR: для чого тут ініціалізовувати якщо потім ти все перетираєш значення ?
 	private ObservableList<News> newsData = FXCollections.observableArrayList();
-	
+
 	public MainApp()
 	{
 		try
 		{
+			// CR: ця змінна ніде не використовується
 			Connection c = instanceDBManager.ConnectionToDB();
-			newsData = instanceDBManager.getData();		
+			// CR: перенеси ініціалізацію данних в start метод
+			newsData = instanceDBManager.getData(); // CR: getNews ???
 		}
 		catch (SQLException e)
 		{
+			// CR: не копіпасть - винеси в окремий метод який приймає alert type, title & text
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(primaryStage);
             alert.setTitle("AMNews");
@@ -89,6 +95,7 @@ public class MainApp extends Application {
 			// Load root layout from fxml file.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+			// CR: приведення не потрібне
 			rootLayout = (BorderPane) loader.load();
 			
 			// Show the scene containing the root layout.
@@ -103,6 +110,7 @@ public class MainApp extends Application {
 		}
 		catch (IOException e)
 		{
+			// CR: що тобі дасть стек трейс тут ? або падай повністю (прокидай на верх завернуте в RuntimeException) або роби recovery
 			e.printStackTrace();
 		}
 	}
@@ -117,16 +125,21 @@ public class MainApp extends Application {
 			 // Load news overview.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/NewsOverview.fxml"));
+			// CR: Не потрібне приведення
 			AnchorPane newsOverview = (AnchorPane) loader.load();
 			
 			// Set news overview into the center of root layout.
 			rootLayout.setCenter(newsOverview);
-			
+
+			// CR: не бачу змісту виносити controllerNewsOverview в поле істанса
 			controllerNewsOverview = loader.getController();
+			// CR: контроллер не повинен нічого знати про main app - почитай про принципи SOLID
+			// CR: додай метод setNewsData
 			controllerNewsOverview.setMainApp(this);
 		}
 		catch (IOException e)
 		{
+			// CR: прокидай на верх
 			e.printStackTrace();
 		}
 	}
@@ -151,6 +164,7 @@ public class MainApp extends Application {
 	/**
 	 * Показуємо вікно додавання нової новини
 	 */
+	// CR: в java використовується тільки camel case це не php
 	public void showNewsAddDialog_NEW()
 	{
 		try
@@ -199,7 +213,9 @@ public class MainApp extends Application {
 	        dialogStage.initOwner(primaryStage);
 	        Scene scene = new Scene(page);
 	        dialogStage.setScene(scene);
-	        
+
+
+					// CR: ти можеш не виносити controllerNewsEditDialog в поле інстанса вистачить і локальної змінної
 	        controllerNewsEditDialog = loader.getController();
 	        //ініціалізації текстових полів
 			controllerNewsEditDialog.setText(news);
@@ -214,6 +230,7 @@ public class MainApp extends Application {
 	        // Show the dialog and wait until the user closes it
 	        dialogStage.showAndWait();
 	    }
+		// CR: у тебе тут жодна стрічка не кидає IOException
 		catch (IOException e)
 		{
 			e.printStackTrace();
@@ -223,11 +240,13 @@ public class MainApp extends Application {
 	/**
 	 * Очищаємо колецію і наповнюємо її новленими даними
 	 */
+	// CR: розділи на два методи - clear & refresh дотримуйся принципу single responsibility (SOLID)
 	public void clearAndGetData()
 	{
 		this.newsData.removeAll(newsData);
 		try
 		{
+			// this.newsData.addAll ???
 			this.newsData = instanceDBManager.getData();		
 		}
 		catch (SQLException e)
