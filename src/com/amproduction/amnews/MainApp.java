@@ -110,7 +110,7 @@ public class MainApp extends Application {
 		}
 		catch (IOException e)
 		{
-			// CR: це типу все ок ? що тобі дасть стек трейс тут ? або падай повністю (прокидай на верх завернуте в RuntimeException) або роби recovery
+			// CR: що тобі дасть стек трейс тут ? або падай повністю (прокидай на верх завернуте в RuntimeException) або роби recovery
 			e.printStackTrace();
 		}
 	}
