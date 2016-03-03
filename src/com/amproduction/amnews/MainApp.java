@@ -38,7 +38,8 @@ public class MainApp extends Application {
 	DBManager instanceDBManager = DBManager.getInstance();
 	
 	private ObservableList<News> newsData = FXCollections.observableArrayList();
-	
+
+	// CR: test comment
 	public MainApp()
 	{
 		try
