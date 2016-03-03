@@ -52,6 +52,7 @@ public class NewsEditDialogController
 	
 	public void setNewsOverviewController(NewsOverviewController aController)
 	{
+		// CR: bController ?
 		this.controller = aController;
     }
 
@@ -66,6 +67,8 @@ public class NewsEditDialogController
 		LocalDateTime createdDate = LocalDateTime.now();
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
 		//перевіряємо чи не порожні поля Теми і Тексту новини
+
+		// CR: equals("") та isEmpty() це те саме
 		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
 				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
 		{
@@ -100,6 +103,7 @@ public class NewsEditDialogController
 			}
 			catch (IOException e)
 			{
+				// CR: копі паст )
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.initOwner(dialogStage);
 				alert.setTitle("AMNews");
@@ -120,7 +124,7 @@ public class NewsEditDialogController
      */
 	public void setText (News aNews)
 	{
-		if (aNews != null)
+		if (aNews != null) // CR: а якщо null то все ок ? юзай Objects.requireNotNull - чим швидше впаде ти легше причину знайти
 		{
 			subjectTextArea.setText(aNews.getSubject());
 			textPresenterTextArea.setText(aNews.getTextPresenter());

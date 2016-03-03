@@ -56,6 +56,8 @@ public class NewsOverviewController {
 		boolean stat = instanceDBManager.getConnectionStatus();
 		if (stat) 
 		{
+
+			// CR: не думаю що юзеру цікаво що щось кудись підєднано :)
 			connectionStatusLabel.setText("Під\'єднано");
 		}
 		
@@ -68,15 +70,20 @@ public class NewsOverviewController {
 
 		//магія Java 8 і Java FX
 		//задаємо дію на вибір дати
+
+		// CR: магія це добре :) а ще крще так datePicker.setOnAction(event -> newsDateFilter());
 		datePicker.setOnAction(event -> {
 			newsDateFilter();
 		});
 
 		//магія Java 8 і Java FX
 		//задаємо дію на подвійний клік на новині
+		// CR: мені назва tv ні про що не говорить
         newsTable.setRowFactory( tv -> {
             TableRow<News> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
+							// CR: 2 - це "магічне число" - винеси в константу з людською назвою
+							// CR: !row.isEmpty() - дужок не треба
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     handleEditNews();
                 }
@@ -197,6 +204,7 @@ public class NewsOverviewController {
 	/**
 	 * Пошук новини за датою створення
 	 */
+	// CR: filterNewsByDate ???
 	@FXML
 	private void newsDateFilter()
 	{		
@@ -208,7 +216,17 @@ public class NewsOverviewController {
 
 		//Якщо юзер вибрав дату
 		if (date != null)
-		{			
+		{
+
+//			CR:
+			/*
+
+			// Java code style
+			if (...) {
+			}
+
+			 */
+
 			//Якщо вибрана дата більша за теперішню
 			if (date.isAfter(dateNow))
 			{

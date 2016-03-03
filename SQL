@@ -36,3 +36,5 @@ CREATE TABLE "News"
 COMMIT;
 
 \q
+
+# CR: можеш створення юзера і бд прибрати - перейменуй файл в create.sql

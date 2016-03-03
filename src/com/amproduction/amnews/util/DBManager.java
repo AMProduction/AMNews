@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ public class DBManager {
 		 return instance;
 	 }
 
+	// CR: для чого тобі connection status ? робиш якусь операцію - відкрив connection - потім закрив
 	private boolean connectionStatus = false;
 
 	/**
@@ -47,6 +49,8 @@ public class DBManager {
 	 * @return зєднання
 	 * @throws IOException	зчитування  з файлу
 	 * @throws SQLException	помилки роботи з базою
+	 *
+	 * // CR: зроби цей метод private і використовуй внутрішньо - тут
      */
 	public Connection ConnectionToDB() throws IOException, SQLException {
 		Connection c = null;
@@ -54,14 +58,20 @@ public class DBManager {
 
 		final String sFileName = "database.properties";
 		String sDirSeparator = System.getProperty("file.separator");
+
+
+		// CR: Це все можна замінити на Paths.get("database.properties") + Files.newInputStream - має працювати
 		File currentDir = new File(".");
 		String sFilePath = currentDir.getCanonicalPath() + sDirSeparator + sFileName;
 
+		// CR: використовуй буферизацію - заверни в BufferedInputStream - прочитай що це і для чого
 		try (InputStream in = new FileInputStream(sFilePath))
 		{
 			props.load(in);
 		}
 
+		// CR: driver - в однині
+		// CR: записуй пропертіс в поля інстанса - нема змісту їх кожного разу вичитувати
 		String drivers = props.getProperty("jdbc.drivers");
 		if (drivers != null)
 			System.setProperty("jdbc.drivers", drivers);
@@ -72,7 +82,8 @@ public class DBManager {
 		c = DriverManager.getConnection(url, username, password);
 	    	
 		setConnectionStatus(true);
-	    
+
+		// CR: с - connection, однобуквенні назви sucks
 	    return c;
 	}
 	
@@ -101,6 +112,8 @@ public class DBManager {
 		if (isConnected)
 		{
 
+			// CR: try-finally і закриттся connection в finally блоці - якби це був back-end ти так швидко можеш виюзати всі доступні
+			// connections до бази - це обмежений ресурс, якщо ти його не закриваєш воно може залишатись у відкритому стані
 			Connection c = ConnectionToDB();
 
 			stmt = c.createStatement();
@@ -116,7 +129,25 @@ public class DBManager {
 
 				newsData.add(new News(id, subject, textPresenter, textNews, createdDate, lastModifiedDate));
 			}
-				
+
+			// CR: звільнення ресурсів ЗАВЖДИ робиться в finally блоці (або використовується try-with-auto-close):
+
+			/*
+			            ;
+			try (Connection = DriverManager.getConnection(
+                      "jdbc:default:connection")) {
+
+            pstmt = con.prepareStatement(
+                        "UPDATE EMPLOYEES " +
+                        "SET CAR_NUMBER = ? " +
+                        "WHERE EMPLOYEE_NUMBER = ?");
+
+            pstmt.setInt(1, carNo);
+            pstmt.setInt(2, empNo);
+            pstmt.executeUpdate();
+        }
+			 */
+
 			rs.close();
 		    stmt.close();
 		}
@@ -142,9 +173,10 @@ public class DBManager {
 		if (isConnected)
 		{
 			Connection c = ConnectionToDB();
-					
+
+			// CR: прочитай про prepared statement і подумай чи варто їх тут заюзати
 			stmt = c.createStatement();
-			c.setAutoCommit(false);
+			c.setAutoCommit(false); // CR: можна перенести в метод який створює connection
 			stat = c.prepareStatement(insertQuery);
 			stat.setString(1, aNews.getSubject());
 			stat.setString(2, aNews.getTextPresenter());
@@ -155,7 +187,7 @@ public class DBManager {
 			stat.executeUpdate();
 		
 			stmt.close();
-			c.commit();
+			c.commit(); // CR: try-catch в catch - rollback, в кінці try - commit
 		}
 	}
 
@@ -167,6 +199,7 @@ public class DBManager {
      */
 	public void updateRecord (News aNews) throws SQLException, IOException
 	{
+		// CR: можна не присвоювати null
 		Statement stmt = null;
 		PreparedStatement stat;
 		final String updateQuery =
@@ -209,7 +242,7 @@ public class DBManager {
 		final String deleteQuery = "DELETE from \"News\" where id = ?";
 		
 		boolean isConnected = getConnectionStatus();
-		if (isConnected)
+		if (isConnected) // CR: а якщо не коннектед то нічо не робимо ? )
 		{
 			Connection c = ConnectionToDB();
 			
@@ -232,6 +265,7 @@ public class DBManager {
 	 * @throws SQLException
 	 * @throws IOException
      */
+	// CR: filterNews ?
 	public ObservableList<News> filter (LocalDate date) throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
