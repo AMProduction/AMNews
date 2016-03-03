@@ -36,7 +36,7 @@ public class MainApp extends Application {
 	NewsOverviewController controllerNewsOverview;
 
 	// CR: просто dbManager - важливо правильно давати імена
-	// CR: тут можна зробити static final константу
+	// CR: тут можна зробити static final константу INSTANCE_DB_MANAGER
 	DBManager instanceDBManager = DBManager.getInstance();
 
 	// CR: для чого тут ініціалізовувати якщо потім ти все перетираєш значення ?
@@ -133,7 +133,7 @@ public class MainApp extends Application {
 
 			// CR: не бачу змісту виносити controllerNewsOverview в поле істанса
 			controllerNewsOverview = loader.getController();
-			// CR: контроллер не повинен нічого знати про main app - почитай про принципи SOLID та loose coupling
+			// CR: контроллер не повинен нічого знати про main app - почитай про принципи SOLID
 			// CR: додай метод setNewsData
 			controllerNewsOverview.setMainApp(this);
 		}
