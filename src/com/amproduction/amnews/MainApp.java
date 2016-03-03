@@ -139,7 +139,7 @@ public class MainApp extends Application {
 		}
 		catch (IOException e)
 		{
-			// CR: stack trace це звичайно круто
+			// CR: прокидай на верх
 			e.printStackTrace();
 		}
 	}
