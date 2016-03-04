@@ -1,21 +1,23 @@
 package com.amproduction.amnews.view;
 
+import com.amproduction.amnews.model.News;
+import com.amproduction.amnews.util.DBManager;
+import com.amproduction.amnews.util.ShowAlert;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-
-import com.amproduction.amnews.model.News;
-import com.amproduction.amnews.util.DBManager;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
+import java.util.Objects;
 
 /**
- *	@version 1.0 2016-02
+ *	Created by snooki on 02.16.
+ *	@version 1.1 2016-03
  *	@author Andrii Malchyk
  */
 
@@ -66,8 +68,7 @@ public class NewsEditDialogController
 		LocalDateTime createdDate = LocalDateTime.now();
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
 		//перевіряємо чи не порожні поля Теми і Тексту новини
-		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
-				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
+		if ((subjectTextArea.getText().equals("")) || textNewsTextArea.getText().equals("") )
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(dialogStage);
@@ -100,13 +101,7 @@ public class NewsEditDialogController
 			}
 			catch (IOException e)
 			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.initOwner(dialogStage);
-				alert.setTitle("AMNews");
-				alert.setHeaderText("Помилка файлу конфігурації");
-				alert.setContentText("Перевірте наявність файлу конфігурації");
-
-				alert.showAndWait();
+				ShowAlert.IOAlert(dialogStage);
 			}
 
 			controller.clearAndRefresh();
@@ -120,12 +115,9 @@ public class NewsEditDialogController
      */
 	public void setText (News aNews)
 	{
-		if (aNews != null)
-		{
-			subjectTextArea.setText(aNews.getSubject());
-			textPresenterTextArea.setText(aNews.getTextPresenter());
-			textNewsTextArea.setText(aNews.getTextNews());
-		}
+		subjectTextArea.setText(Objects.requireNonNull(aNews).getSubject());
+		textPresenterTextArea.setText(Objects.requireNonNull(aNews).getTextPresenter());
+		textNewsTextArea.setText(Objects.requireNonNull(aNews).getTextNews());
 	}
 
 	/**
@@ -135,7 +127,7 @@ public class NewsEditDialogController
      */
 	public void setNews (News aNews)
 	{
-		this.news = aNews;
+		this.news = Objects.requireNonNull(aNews);
 	}
 
 	/**
@@ -147,8 +139,8 @@ public class NewsEditDialogController
 		//отримуємо дату останнього редагування
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
 		//перевіряємо чи не порожні поля Теми і Тексту новини
-		if ((subjectTextArea.getText().equals("") || subjectTextArea.getText().isEmpty()) ||
-				textNewsTextArea.getText().equals("") || textNewsTextArea.getText().isEmpty())
+		if (subjectTextArea.getText().equals("") ||
+				textNewsTextArea.getText().equals(""))
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(dialogStage);
@@ -180,13 +172,7 @@ public class NewsEditDialogController
 			}
 			catch (IOException e)
 			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.initOwner(dialogStage);
-				alert.setTitle("AMNews");
-				alert.setHeaderText("Помилка файлу конфігурації");
-				alert.setContentText("Перевірте наявність файлу конфігурації");
-
-				alert.showAndWait();
+				ShowAlert.IOAlert(dialogStage);
 			}
 
 			//оновлюємо таблицю

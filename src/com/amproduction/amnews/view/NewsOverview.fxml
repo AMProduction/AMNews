@@ -3,7 +3,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -12,18 +11,6 @@
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.amproduction.amnews.view.NewsOverviewController">
    <children>
       <BorderPane prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <bottom>
-            <Label fx:id="connectionStatusLabel" prefHeight="42.0" prefWidth="568.0" text="Немає з'єднання з базою даних" BorderPane.alignment="CENTER">
-               <graphic>
-                  <ButtonBar prefHeight="83.0" prefWidth="364.0">
-                    <buttons>
-                      <Button mnemonicParsing="false" onAction="#handleNewNews" text="Додати" />
-                        <Button mnemonicParsing="false" onAction="#handleEditNews" text="Редагувати" />
-                        <Button mnemonicParsing="false" onAction="#handleDeleteNews" text="Видалити" />
-                    </buttons>
-                  </ButtonBar>
-               </graphic></Label>
-         </bottom>
          <center>
             <TableView fx:id="newsTable" prefHeight="518.0" prefWidth="0.0" BorderPane.alignment="CENTER">
               <columns>
@@ -36,12 +23,21 @@
          <top>
             <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <buttons>
-                  <DatePicker fx:id="datePicker" prefHeight="25.0" prefWidth="193.0" promptText="Виберіть дату" />
-                  <Button disable="true" mnemonicParsing="false" onAction="#newsDateFilter" text="Пошук" />
+                  <DatePicker fx:id="datePicker" onAction="#filterNewsByDate" prefHeight="25.0" prefWidth="193.0" promptText="Виберіть дату" />
+                  <Button disable="true" mnemonicParsing="false" onAction="#filterNewsByDate" text="Пошук" />
                   <Button mnemonicParsing="false" onAction="#clearAndRefresh" text="Скинути" />
               </buttons>
             </ButtonBar>
          </top>
+         <bottom>
+            <ButtonBar prefHeight="41.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button mnemonicParsing="false" onAction="#handleNewNews" text="Додати" />
+                  <Button mnemonicParsing="false" onAction="#handleEditNews" text="Редагувати" />
+                  <Button mnemonicParsing="false" onAction="#handleDeleteNews" text="Видалити" />
+              </buttons>
+            </ButtonBar>
+         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>

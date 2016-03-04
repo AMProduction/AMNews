@@ -4,20 +4,15 @@ import com.amproduction.amnews.model.News;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
 /**
- *	@version 1.0 2016-02
+ *	Created by snooki on 02.16.
+ *	@version 1.1 2016-03
  *	@author Andrii Malchyk
  */
 
@@ -40,7 +35,10 @@ public class DBManager {
 		 return instance;
 	 }
 
-	private boolean connectionStatus = false;
+//	private boolean connectionStatus = false;
+	private String url;
+	private String username;
+	private String password;
 
 	/**
 	 * Зєднання з базою. Параметри підключення зчитуємо з файла
@@ -48,8 +46,8 @@ public class DBManager {
 	 * @throws IOException	зчитування  з файлу
 	 * @throws SQLException	помилки роботи з базою
      */
-	public Connection ConnectionToDB() throws IOException, SQLException {
-		Connection c = null;
+	private Connection ConnectionToDB() throws IOException, SQLException {
+		Connection connect;
 		Properties props = new Properties();
 
 		final String sFileName = "database.properties";
@@ -57,26 +55,27 @@ public class DBManager {
 		File currentDir = new File(".");
 		String sFilePath = currentDir.getCanonicalPath() + sDirSeparator + sFileName;
 
-		try (InputStream in = new FileInputStream(sFilePath))
+		try (InputStream in = new BufferedInputStream(new FileInputStream(sFilePath)))
 		{
 			props.load(in);
 		}
 
-		String drivers = props.getProperty("jdbc.drivers");
-		if (drivers != null)
-			System.setProperty("jdbc.drivers", drivers);
-		String url = props.getProperty("jdbc.url");
-		String username = props.getProperty("jdbc.username");
-		String password = props.getProperty("jdbc.password");
+		String driver = props.getProperty("jdbc.drivers");
+		if (driver != null)
+			System.setProperty("jdbc.drivers", driver);
+		url = props.getProperty("jdbc.url");
+		username = props.getProperty("jdbc.username");
+		password = props.getProperty("jdbc.password");
 
-		c = DriverManager.getConnection(url, username, password);
+		connect = DriverManager.getConnection(url, username, password);
+        connect.setAutoCommit(false);
 	    	
-		setConnectionStatus(true);
+		//setConnectionStatus(true);
 	    
-	    return c;
+	    return connect;
 	}
 	
-	public boolean getConnectionStatus()
+/*	public boolean getConnectionStatus()
 	{
 		return connectionStatus;
 	}
@@ -85,28 +84,23 @@ public class DBManager {
 	{
 		connectionStatus = status;
 	}
-
+*/
 	/**
 	 * Зчитуємо з бази дані. Заносимо у колекцію
 	 * @return newsData ObservableList<News> колекція обєктів
 	 * @throws SQLException	помилки роботи з базою
 	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
      */
-	public ObservableList<News> getData() throws SQLException, IOException
+	public ObservableList<News> getNews() throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
-		Statement stmt = null;
+		Statement stmt;
+		Connection connect = ConnectionToDB();
 		
-		boolean isConnected = getConnectionStatus();
-		if (isConnected)
-		{
-
-			Connection c = ConnectionToDB();
-
-			stmt = c.createStatement();
+		try {
+			stmt = connect.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM \"News\"");
-			while (rs.next())
-			{
+			while (rs.next()) {
 				int id = rs.getInt("id");
 				String subject = rs.getString("subject");
 				String textPresenter = rs.getString("text_presenter");
@@ -116,9 +110,12 @@ public class DBManager {
 
 				newsData.add(new News(id, subject, textPresenter, textNews, createdDate, lastModifiedDate));
 			}
-				
-			rs.close();
-		    stmt.close();
+            rs.close();
+            stmt.close();
+		}
+		finally {
+			if (connect != null)
+				connect.close();
 		}
 		
 		return newsData;
@@ -132,20 +129,17 @@ public class DBManager {
      */
 	public void addRecord (News aNews) throws SQLException, IOException
 	{
-		Statement stmt = null;
+		Statement stmt;
 		PreparedStatement stat;
 		final String insertQuery =
 				"INSERT INTO \"News\" (subject, text_presenter, text_news, created_date, last_modified_date)"
 				+ "VALUES (?, ?, ?, ?, ?)";
-		
-		boolean isConnected = getConnectionStatus();
-		if (isConnected)
-		{
-			Connection c = ConnectionToDB();
-					
-			stmt = c.createStatement();
-			c.setAutoCommit(false);
-			stat = c.prepareStatement(insertQuery);
+
+		Connection connect = ConnectionToDB();
+
+		try{
+			stmt = connect.createStatement();
+			stat = connect.prepareStatement(insertQuery);
 			stat.setString(1, aNews.getSubject());
 			stat.setString(2, aNews.getTextPresenter());
 			stat.setString(3, aNews.getTextNews());
@@ -155,7 +149,15 @@ public class DBManager {
 			stat.executeUpdate();
 		
 			stmt.close();
-			c.commit();
+			connect.commit();
+		}
+        catch (SQLException e)
+        {
+            connect.rollback();
+        }
+		finally {
+			if (connect != null)
+				connect.close();
 		}
 	}
 
@@ -167,22 +169,20 @@ public class DBManager {
      */
 	public void updateRecord (News aNews) throws SQLException, IOException
 	{
-		Statement stmt = null;
+		Statement stmt;
 		PreparedStatement stat;
 		final String updateQuery =
 				"UPDATE \"News\" set subject = ?, text_presenter = ?, text_news = ?, "
 				+ "created_date = ?, last_modified_date = ? "
 				+ "where id = ?";
-		
-		boolean isConnected = getConnectionStatus();
-		if (isConnected)
-		{
-			Connection c = ConnectionToDB();
-			
-			stmt = c.createStatement();
-			c.setAutoCommit(false);
+
+        Connection connect = ConnectionToDB();
+
+        try
+        {
+			stmt = connect.createStatement();
 				
-			stat = c.prepareStatement(updateQuery);
+			stat = connect.prepareStatement(updateQuery);
 			stat.setString(1, aNews.getSubject());
 			stat.setString(2, aNews.getTextPresenter());
 			stat.setString(3, aNews.getTextNews());
@@ -192,8 +192,16 @@ public class DBManager {
 				
 			stat.executeUpdate();
 			stmt.close();
-			c.commit();
+			connect.commit();
 		}
+        catch (SQLException e)
+        {
+            connect.rollback();
+        }
+        finally {
+            if (connect != null)
+                connect.close();
+        }
 	}
 
 	/**
@@ -204,25 +212,31 @@ public class DBManager {
      */
 	public void deleteRecord (News aNews) throws SQLException, IOException
 	{
-		Statement stmt = null;
+		Statement stmt;
 		PreparedStatement stat;
 		final String deleteQuery = "DELETE from \"News\" where id = ?";
-		
-		boolean isConnected = getConnectionStatus();
-		if (isConnected)
-		{
-			Connection c = ConnectionToDB();
-			
-			stmt = c.createStatement();
-			c.setAutoCommit(false);
-				
-			stat = c.prepareStatement(deleteQuery);
+
+        Connection connect = ConnectionToDB();
+
+        try
+        {
+			stmt = connect.createStatement();
+
+			stat = connect.prepareStatement(deleteQuery);
 			stat.setInt(1, aNews.getId());
 				
 			stat.executeUpdate();
 			stmt.close();
-			c.commit();
+			connect.commit();
 		}
+        catch (SQLException e)
+        {
+            connect.rollback();
+        }
+        finally {
+            if (connect != null)
+                connect.close();
+        }
 	}
 
 	/**
@@ -232,20 +246,19 @@ public class DBManager {
 	 * @throws SQLException
 	 * @throws IOException
      */
-	public ObservableList<News> filter (LocalDate date) throws SQLException, IOException
+	public ObservableList<News> filterNews (LocalDate date) throws SQLException, IOException
 	{
 		ObservableList<News> newsData = FXCollections.observableArrayList();
 		
 		PreparedStatement stat;
 		final String filterQuery = "SELECT * FROM \"News\" WHERE "
 				+ "created_date::date = ?";
-		
-		boolean isConnected = getConnectionStatus();
-		if (isConnected)
-		{
-			Connection c = ConnectionToDB();
-			
-			stat = c.prepareStatement(filterQuery);
+
+        Connection connect = ConnectionToDB();
+
+        try
+        {
+			stat = connect.prepareStatement(filterQuery);
 			stat.setDate(1, Date.valueOf(date));
 			
 			ResultSet rs = stat.executeQuery();
@@ -261,8 +274,14 @@ public class DBManager {
 					
 				newsData.add(new News(id, subject, textPresenter, textNews, createdDate, lastModifiedDate));
 			}
-				
+
+            rs.close();
+            stat.close();
 		}
+        finally {
+            if (connect != null)
+                connect.close();
+        }
 		
 		return newsData;
 	}

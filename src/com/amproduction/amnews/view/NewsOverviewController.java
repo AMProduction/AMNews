@@ -3,6 +3,7 @@ package com.amproduction.amnews.view;
 import com.amproduction.amnews.MainApp;
 import com.amproduction.amnews.model.News;
 import com.amproduction.amnews.util.DBManager;
+import com.amproduction.amnews.util.ShowAlert;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,7 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- *	@version 1.0 2016-02
+ *	Created by snooki on 02.16.
+ *	@version 1.1 2016-03
  *	@author Andrii Malchyk
  */
 
@@ -30,14 +32,13 @@ public class NewsOverviewController {
     private TableColumn<News, LocalDateTime> lastModifiedDateColumn;
 	
 	@FXML
-    private Label connectionStatusLabel;
-	
-	@FXML
 	private DatePicker datePicker;
 	
 	private MainApp mainApp;
+
+	private  final int CLICK_COUNT = 2;
 	
-	DBManager instanceDBManager = DBManager.getInstance();
+	final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
 	
 	public NewsOverviewController()
 	{	
@@ -52,13 +53,6 @@ public class NewsOverviewController {
 		idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
 		subjectColumn.setCellValueFactory(cellData -> cellData.getValue().subjectProperty());
 		lastModifiedDateColumn.setCellValueFactory(cellData -> cellData.getValue().lastModifiedDateProperty());
-		//відображаємо стан зєднання на мітці
-		boolean stat = instanceDBManager.getConnectionStatus();
-		if (stat) 
-		{
-			connectionStatusLabel.setText("Під\'єднано");
-		}
-		
     }
 		
 	public void setMainApp(MainApp mainApp)
@@ -68,16 +62,14 @@ public class NewsOverviewController {
 
 		//магія Java 8 і Java FX
 		//задаємо дію на вибір дати
-		datePicker.setOnAction(event -> {
-			newsDateFilter();
-		});
+		datePicker.setOnAction(event -> filterNewsByDate());
 
 		//магія Java 8 і Java FX
 		//задаємо дію на подвійний клік на новині
-        newsTable.setRowFactory( tv -> {
+        newsTable.setRowFactory( dblClick -> {
             TableRow<News> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == CLICK_COUNT && !row.isEmpty() ) {
                     handleEditNews();
                 }
             });
@@ -91,7 +83,7 @@ public class NewsOverviewController {
 	@FXML
 	private void handleNewNews()
 	{
-		mainApp.showNewsAddDialog_NEW();
+		mainApp.showNewsAddDialogNew();
 	}
 
 	/**
@@ -101,7 +93,8 @@ public class NewsOverviewController {
 	@FXML
 	public void clearAndRefresh()
 	{	
-		mainApp.clearAndGetData();
+		mainApp.clearData();
+		mainApp.getData();
 		newsTable.setItems(mainApp.getNewsData());
 	}
 
@@ -122,7 +115,7 @@ public class NewsOverviewController {
 			//і видаляємо його
 			try
 			{
-				instanceDBManager.deleteRecord(selectedNews);
+				INSTANCE_DB_MANAGER.deleteRecord(selectedNews);
 			}
 			catch (SQLException e)
 			{
@@ -138,16 +131,9 @@ public class NewsOverviewController {
 			}
 			catch (IOException e)
 			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.initOwner(mainApp.getPrimaryStage());
-				alert.setTitle("AMNews");
-				alert.setHeaderText("Помилка файлу конфігурації");
-				alert.setContentText("Перевірте наявність файлу конфігурації");
-
-				alert.showAndWait();
+				ShowAlert.IOAlert(mainApp.getPrimaryStage());
 			}
 
-			
 			clearAndRefresh();
 		}
 		//якщо нічого не вибрано
@@ -178,7 +164,7 @@ public class NewsOverviewController {
 			//отримуємо виділений елемент
 			News selectedNews = newsTable.getSelectionModel().getSelectedItem();
 			// і викликаємо вікно редагування, передавши туди вибрану новину
-			mainApp.showNewsAddDialog_EDIT(selectedNews);
+			mainApp.showNewsAddDialogEdit(selectedNews);
 		}
 		//якщо нічого не вибрано
 		else
@@ -198,7 +184,7 @@ public class NewsOverviewController {
 	 * Пошук новини за датою створення
 	 */
 	@FXML
-	private void newsDateFilter()
+	private void filterNewsByDate()
 	{		
 		ObservableList<News> newsData = FXCollections.observableArrayList();    
 		//отримуємо дату з DatePicker
@@ -225,7 +211,7 @@ public class NewsOverviewController {
 				//якщо з дато все ок пробуємо пошукати
 				try
 				{
-					newsData = instanceDBManager.filter(date);
+					newsData = INSTANCE_DB_MANAGER.filterNews(date);
 				}
 				catch (SQLException e)
 				{
@@ -239,13 +225,7 @@ public class NewsOverviewController {
 				}
 				catch (IOException e)
 				{
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.initOwner(mainApp.getPrimaryStage());
-					alert.setTitle("AMNews");
-					alert.setHeaderText("Помилка файлу конфігурації");
-					alert.setContentText("Перевірте наявність файлу конфігурації");
-
-					alert.showAndWait();
+					ShowAlert.IOAlert(mainApp.getPrimaryStage());
 				}
 				//Якщо нічого не знайшли
 				if (newsData.isEmpty())
@@ -261,7 +241,8 @@ public class NewsOverviewController {
 				//Якщо знайшли, то виводимо знайдене у таблицю
 				else
 				{
-					mainApp.clearAndGetData();
+					mainApp.clearData();
+					mainApp.getData();
 					newsTable.setItems(newsData);
 				}
 			}

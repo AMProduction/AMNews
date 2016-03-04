@@ -1,8 +1,6 @@
 package com.amproduction.amnews.view;
 
 import com.amproduction.amnews.MainApp;
-import com.amproduction.amnews.model.News;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -49,7 +47,7 @@ public class RootLayoutController {
 	@FXML
 	private void handleNewNews()
 	{
-		mainApp.showNewsAddDialog_NEW();
+		mainApp.showNewsAddDialogNew();
 	}
 	
 }

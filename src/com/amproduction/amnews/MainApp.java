@@ -1,17 +1,12 @@
 package com.amproduction.amnews;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import com.amproduction.amnews.model.News;
 import com.amproduction.amnews.util.DBManager;
+import com.amproduction.amnews.util.ShowAlert;
 import com.amproduction.amnews.view.NewsEditDialogController;
 import com.amproduction.amnews.view.NewsOverviewController;
 import com.amproduction.amnews.view.RootLayoutController;
-
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,8 +17,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
- *	@version 1.0 2016-02
+ *  Created by snooki on 02.16.
+ *	@version 1.1 2016-03
  *	@author Andrii Malchyk
  */
 
@@ -35,43 +34,37 @@ public class MainApp extends Application {
 	NewsEditDialogController controllerNewsEditDialog;
 	NewsOverviewController controllerNewsOverview;
 	
-	DBManager instanceDBManager = DBManager.getInstance();
+	final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
 	
-	private ObservableList<News> newsData = FXCollections.observableArrayList();
+	private ObservableList<News> newsData;
 	
 	public MainApp()
 	{
-		try
-		{
-			Connection c = instanceDBManager.ConnectionToDB();
-			newsData = instanceDBManager.getData();		
-		}
-		catch (SQLException e)
-		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.initOwner(primaryStage);
-            alert.setTitle("AMNews");
-            alert.setHeaderText("Помилка отримання даних");
-            alert.setContentText("Перевірте з\'єднання з базою даних");
-
-            alert.showAndWait();
-		}
-		catch (IOException e)
-		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.initOwner(primaryStage);
-			alert.setTitle("AMNews");
-			alert.setHeaderText("Помилка файлу конфігурації");
-			alert.setContentText("Перевірте наявність файлу конфігурації");
-
-			alert.showAndWait();
-		}
 	}
 
 	@Override
 	public void start(Stage primaryStage)
 	{
-		this.primaryStage = primaryStage;
+        try
+        {
+            newsData = INSTANCE_DB_MANAGER.getNews();
+        }
+        catch (SQLException e)
+        {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.initOwner(primaryStage);
+            alert.setTitle("AMNews");
+            alert.setHeaderText("Помилка отримання даних");
+            alert.setContentText("Перевірте з\'єднання з базою даних");
+
+            alert.showAndWait();
+        }
+        catch (IOException e)
+        {
+            ShowAlert.IOAlert(primaryStage);
+        }
+
+        this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("AMNews");
 		
 		initRootLayout();
@@ -84,27 +77,26 @@ public class MainApp extends Application {
      */
 	public void initRootLayout()
 	{
-		try
-		{		
-			// Load root layout from fxml file.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-			rootLayout = (BorderPane) loader.load();
+        // Load root layout from fxml file.
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+        try {
+            rootLayout = loader.load();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        // Show the scene containing the root layout.
+        Scene scene = new Scene(rootLayout);
+        primaryStage.setScene(scene);
 			
-			// Show the scene containing the root layout.
-			Scene scene = new Scene(rootLayout);
-			primaryStage.setScene(scene);
-			
-			// Give the controller access to the main app.
-	        RootLayoutController controller = loader.getController();
-	        controller.setMainApp(this);
+        // Give the controller access to the main app.
+        RootLayoutController controller = loader.getController();
+        controller.setMainApp(this);
 	        
-			primaryStage.show();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+        primaryStage.show();
 	}
 	
 	/**
@@ -117,8 +109,8 @@ public class MainApp extends Application {
 			 // Load news overview.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/NewsOverview.fxml"));
-			AnchorPane newsOverview = (AnchorPane) loader.load();
-			
+			AnchorPane newsOverview = loader.load();
+
 			// Set news overview into the center of root layout.
 			rootLayout.setCenter(newsOverview);
 			
@@ -151,13 +143,13 @@ public class MainApp extends Application {
 	/**
 	 * Показуємо вікно додавання нової новини
 	 */
-	public void showNewsAddDialog_NEW()
+	public void showNewsAddDialogNew()
 	{
 		try
 		{
 			FXMLLoader loader = new FXMLLoader();
 	        loader.setLocation(MainApp.class.getResource("view/NewsEditDialog.fxml"));
-	        AnchorPane page = (AnchorPane) loader.load();
+	        AnchorPane page = loader.load();
 	        
 	        Stage dialogStage = new Stage();
 	        dialogStage.setTitle("Add News");
@@ -185,13 +177,13 @@ public class MainApp extends Application {
 	 * Показуємо вікно редгування новини
 	 * @param news передаємо обєкт у метод відображення для ініціалізації текстових полів
      */
-	public void showNewsAddDialog_EDIT(News news)
+	public void showNewsAddDialogEdit(News news)
 	{
 		try
 		{
 			FXMLLoader loader = new FXMLLoader();
 	        loader.setLocation(MainApp.class.getResource("view/NewsEditDialog.fxml"));
-	        AnchorPane page = (AnchorPane) loader.load();
+	        AnchorPane page = loader.load();
 	        
 	        Stage dialogStage = new Stage();
 	        dialogStage.setTitle("Add News");
@@ -223,32 +215,30 @@ public class MainApp extends Application {
 	/**
 	 * Очищаємо колецію і наповнюємо її новленими даними
 	 */
-	public void clearAndGetData()
+	public void clearData()
 	{
 		this.newsData.removeAll(newsData);
+	}
+
+	public void getData()
+	{
 		try
 		{
-			this.newsData = instanceDBManager.getData();		
+			this.newsData = INSTANCE_DB_MANAGER.getNews();
 		}
 		catch (SQLException e)
 		{
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(primaryStage);
-            alert.setTitle("AMNews");
-            alert.setHeaderText("Помилка оновлення таблиці");
-            alert.setContentText("Перевірте з\'єднання з базою даних");
+			alert.setTitle("AMNews");
+			alert.setHeaderText("Помилка оновлення таблиці");
+			alert.setContentText("Перевірте з\'єднання з базою даних");
 
-            alert.showAndWait();
+			alert.showAndWait();
 		}
 		catch (IOException e)
 		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.initOwner(primaryStage);
-			alert.setTitle("AMNews");
-			alert.setHeaderText("Помилка файлу конфігурації");
-			alert.setContentText("Перевірте наявність файлу конфігурації");
-
-			alert.showAndWait();
+			ShowAlert.IOAlert(primaryStage);
 		}
 	}
 }
