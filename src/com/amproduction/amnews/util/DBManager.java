@@ -68,8 +68,6 @@ public class DBManager {
 
 		connect = DriverManager.getConnection(url, username, password);
         connect.setAutoCommit(false);
-	    	
-		//setConnectionStatus(true);
 	    
 	    return connect;
 	}
