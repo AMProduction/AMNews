@@ -38,7 +38,7 @@ public class MainApp extends Application {
 	
 	private ObservableList<News> newsData;
 	
-	private MainApp()
+	public MainApp()
 	{
 	}
 
