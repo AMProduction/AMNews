@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  */
 
 public class NewsOverviewController {
-	@FXML
+    @FXML
     private TableView<News> newsTable;
     @FXML
     private TableColumn<News, Integer> idColumn;
@@ -36,9 +36,9 @@ public class NewsOverviewController {
 	
 	private MainApp mainApp;
 
-	private  final int CLICK_COUNT = 2;
+	private final int CLICK_COUNT = 2;
 	
-	final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
+	private final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
 	
 	public NewsOverviewController()
 	{	

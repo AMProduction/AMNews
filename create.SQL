@@ -1,21 +1,3 @@
-sudo -u postgres psql
-
-CREATE ROLE dbuser1 LOGIN
-  UNENCRYPTED PASSWORD '1988'
-  SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
-
-CREATE DATABASE "AMNews"
-  WITH OWNER = dbuser1
-       ENCODING = 'UTF8'
-       TABLESPACE = pg_default
-       LC_COLLATE = 'uk_UA.UTF-8'
-       LC_CTYPE = 'uk_UA.UTF-8'
-       CONNECTION LIMIT = -1;
-
-\q
-
-psql -h localhost AMNews dbuser1
-
 BEGIN;
 CREATE SEQUENCE auto_id_news
   INCREMENT 1
@@ -34,5 +16,3 @@ CREATE TABLE "News"
   CONSTRAINT "News_pkey" PRIMARY KEY (id)
 );
 COMMIT;
-
-\q

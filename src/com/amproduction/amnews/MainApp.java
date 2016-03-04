@@ -31,14 +31,14 @@ public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
-	NewsEditDialogController controllerNewsEditDialog;
-	NewsOverviewController controllerNewsOverview;
+	private NewsEditDialogController controllerNewsEditDialog;
+	private NewsOverviewController controllerNewsOverview;
 	
-	final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
+	private final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
 	
 	private ObservableList<News> newsData;
 	
-	public MainApp()
+	private MainApp()
 	{
 	}
 
@@ -75,7 +75,7 @@ public class MainApp extends Application {
 	/**
      * Initializes the root layout.
      */
-	public void initRootLayout()
+	private void initRootLayout()
 	{
         // Load root layout from fxml file.
         FXMLLoader loader = new FXMLLoader();
@@ -102,7 +102,7 @@ public class MainApp extends Application {
 	/**
      * Відображаємо NewsOverview всередині RootLayout
      */
-	public void showNewsOverview()
+	private void showNewsOverview()
 	{
 		try
 		{
@@ -125,7 +125,7 @@ public class MainApp extends Application {
 	
 	/**
      * Returns the main stage.
-     * @return
+     * @return Return the main stage
      */
 	public Stage getPrimaryStage()
 	{

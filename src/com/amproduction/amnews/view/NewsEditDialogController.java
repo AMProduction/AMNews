@@ -38,9 +38,9 @@ public class NewsEditDialogController
 	private News news;
 	private Stage dialogStage;
 	
-	NewsOverviewController controller;
+	private NewsOverviewController controller;
 	
-	DBManager instanceDBManager = DBManager.getInstance();
+	private DBManager instanceDBManager = DBManager.getInstance();
 	
 	@FXML
 	private void initialize()

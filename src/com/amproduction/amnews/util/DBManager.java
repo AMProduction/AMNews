@@ -35,7 +35,6 @@ public class DBManager {
 		 return instance;
 	 }
 
-//	private boolean connectionStatus = false;
 	private String url;
 	private String username;
 	private String password;
@@ -74,17 +73,7 @@ public class DBManager {
 	    
 	    return connect;
 	}
-	
-/*	public boolean getConnectionStatus()
-	{
-		return connectionStatus;
-	}
-	
-	public void setConnectionStatus (boolean status)
-	{
-		connectionStatus = status;
-	}
-*/
+
 	/**
 	 * Зчитуємо з бази дані. Заносимо у колекцію
 	 * @return newsData ObservableList<News> колекція обєктів
