@@ -1,11 +1,9 @@
 package com.amproduction.amnews.view;
 
 import com.amproduction.amnews.model.News;
+import com.amproduction.amnews.util.AlertUtils;
 import com.amproduction.amnews.util.DBManager;
-import com.amproduction.amnews.util.ShowAlert;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
@@ -39,21 +37,23 @@ public class NewsEditDialogController
 	private Stage dialogStage;
 	
 	private NewsOverviewController controller;
-	
-	private DBManager instanceDBManager = DBManager.getInstance();
+
+	private final String HEADER_TEXT_IO_ERROR = "Помилка файлу конфігурації";
+	private final String CONTENT_TEXT_IO_ERROR = "Перевірте наявність файлу конфігурації";
+    private final String HEADER_TEXT_EMPTY_FIELD_ERROR = "Порожні поля";
+    private final String CONTENT_TEXT_EMPTY_FIELD_ERROR = "Поле теми і/або тексту новини не може бути порожнім!";
+
+	private static final DBManager instanceDBManager = DBManager.getInstance();
 	
 	@FXML
-	private void initialize()
-	{
+	private void initialize() {
 	}
 	
-	public void setDialogStage(Stage dialogStage)
-	{
+	public void setDialogStage(Stage dialogStage) {
 		this.dialogStage = dialogStage;
     }
 	
-	public void setNewsOverviewController(NewsOverviewController aController)
-	{
+	public void setNewsOverviewController(NewsOverviewController aController) {
 		this.controller = aController;
     }
 
@@ -61,47 +61,29 @@ public class NewsEditDialogController
 	 * Обробник кнопки Зберегти (нова новина)
 	 */
 	@FXML
-	private void handleSaveNews()
-	{
+	private void handleSaveNews() {
 		//отримуємо дати створення і останнього редагування
 		//у даному методі вони співпадають
 		LocalDateTime createdDate = LocalDateTime.now();
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
 		//перевіряємо чи не порожні поля Теми і Тексту новини
-		if ((subjectTextArea.getText().equals("")) || textNewsTextArea.getText().equals("") )
-		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.initOwner(dialogStage);
-			alert.setTitle("AMNews");
-			alert.setHeaderText("Порожні поля");
-			alert.setContentText("Поле теми і/або тексту новини не може бути порожнім!");
-
-			alert.showAndWait();
+		if ((subjectTextArea.getText().equals("")) || textNewsTextArea.getText().equals("") ) {
+            AlertUtils.showErrorAlert(dialogStage, HEADER_TEXT_EMPTY_FIELD_ERROR, CONTENT_TEXT_EMPTY_FIELD_ERROR);
 		}
 		//якщо все ОК, то зберігаємо
-		else
-		{
+		else {
 			News news = new News(subjectTextArea.getText(), textPresenterTextArea.getText(),
 					textNewsTextArea.getText(), createdDate, lastModifiedDate);
-			try
-			{
+			try {
 				instanceDBManager.addRecord(news);
 			}
-			catch (SQLException e)
-			{
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.initOwner(dialogStage);
-				alert.setTitle("AMNews");
-				alert.setHeaderText("Помилка додавання запису");
-				alert.setContentText("Перевірте з\'єднання з базою даних\n"
-					+ "Перевірте правльність даних\n"
-					+ "Дані не збережені !");
-
-				alert.showAndWait();
+			catch (SQLException e) {
+                AlertUtils.showErrorAlert(dialogStage, "Помилка додавання запису", "Перевірте з\'єднання з базою даних\n"
+                        + "Перевірте правльність даних\n"
+                        + "Дані не збережені !");
 			}
-			catch (IOException e)
-			{
-				ShowAlert.IOAlert(dialogStage);
+			catch (IOException e) {
+                AlertUtils.showErrorAlert(dialogStage, HEADER_TEXT_IO_ERROR, CONTENT_TEXT_IO_ERROR);
 			}
 
 			controller.clearAndRefresh();
@@ -113,8 +95,7 @@ public class NewsEditDialogController
 	 * ініціалізуємо текстові поля
 	 * @param aNews отримуємо дані з параметра
      */
-	public void setText (News aNews)
-	{
+	public void setText (News aNews) {
 		subjectTextArea.setText(Objects.requireNonNull(aNews).getSubject());
 		textPresenterTextArea.setText(Objects.requireNonNull(aNews).getTextPresenter());
 		textNewsTextArea.setText(Objects.requireNonNull(aNews).getTextNews());
@@ -125,8 +106,7 @@ public class NewsEditDialogController
 	 * Потрібно для методу handleUpdateNews()
 	 * @param aNews звідси отримуємо id
      */
-	public void setNews (News aNews)
-	{
+	public void setNews (News aNews) {
 		this.news = Objects.requireNonNull(aNews);
 	}
 
@@ -140,15 +120,8 @@ public class NewsEditDialogController
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
 		//перевіряємо чи не порожні поля Теми і Тексту новини
 		if (subjectTextArea.getText().equals("") ||
-				textNewsTextArea.getText().equals(""))
-		{
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.initOwner(dialogStage);
-			alert.setTitle("AMNews");
-			alert.setHeaderText("Порожні поля");
-			alert.setContentText("Поле теми і/або тексту новини не може бути порожнім !");
-
-			alert.showAndWait();
+				textNewsTextArea.getText().equals("")) {
+            AlertUtils.showErrorAlert(dialogStage, HEADER_TEXT_EMPTY_FIELD_ERROR, CONTENT_TEXT_EMPTY_FIELD_ERROR);
 		}
 		//якщо все ОК
 		else {
@@ -160,19 +133,13 @@ public class NewsEditDialogController
 			try {
 				instanceDBManager.updateRecord(updateNews);
 			} catch (SQLException e) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.initOwner(dialogStage);
-				alert.setTitle("AMNews");
-				alert.setHeaderText("Помилка оновлення запису");
-				alert.setContentText("Перевірте з\'єднання з базою даних\n"
-						+ "Перевірте правльність даних\n"
-						+ "Дані не збережені !");
-
-				alert.showAndWait();
+                AlertUtils.showErrorAlert(dialogStage, "Помилка оновлення запису",
+                        "Перевірте з\'єднання з базою даних\n"
+                                + "Перевірте правльність даних\n"
+                                + "Дані не збережені !");
 			}
-			catch (IOException e)
-			{
-				ShowAlert.IOAlert(dialogStage);
+			catch (IOException e) {
+                AlertUtils.showErrorAlert(dialogStage, HEADER_TEXT_IO_ERROR, CONTENT_TEXT_IO_ERROR);
 			}
 
 			//оновлюємо таблицю
@@ -184,16 +151,14 @@ public class NewsEditDialogController
 	/**
 	 * відключаємо кнопку Зберегти
 	 */
-	public void setSaveButtonOff()
-	{
+	public void setSaveButtonOff() {
 		saveButton.setDisable(true);
 	}
 
 	/**
 	 * відключаємо кнопку Оновити
 	 */
-	public void setUpdateButtonOff()
-	{
+	public void setUpdateButtonOff() {
 		updateButton.setDisable(true);
 	}
 }

@@ -1,8 +1,8 @@
 package com.amproduction.amnews;
 
 import com.amproduction.amnews.model.News;
+import com.amproduction.amnews.util.AlertUtils;
 import com.amproduction.amnews.util.DBManager;
-import com.amproduction.amnews.util.ShowAlert;
 import com.amproduction.amnews.view.NewsEditDialogController;
 import com.amproduction.amnews.view.NewsOverviewController;
 import com.amproduction.amnews.view.RootLayoutController;
@@ -35,22 +35,21 @@ public class MainApp extends Application {
 	private NewsOverviewController controllerNewsOverview;
 	
 	private final DBManager INSTANCE_DB_MANAGER = DBManager.getInstance();
-	
+
+	private final String HEADER_TEXT = "Помилка файлу конфігурації";
+	private final String CONTENT_TEXT = "Перевірте наявність файлу конфігурації";
+
 	private ObservableList<News> newsData;
-	
-	public MainApp()
-	{
+
+	public MainApp() {
 	}
 
 	@Override
-	public void start(Stage primaryStage)
-	{
-        try
-        {
+	public void start(Stage primaryStage) {
+        try {
             newsData = INSTANCE_DB_MANAGER.getNews();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             Alert alert = new Alert(AlertType.ERROR);
             alert.initOwner(primaryStage);
             alert.setTitle("AMNews");
@@ -59,9 +58,8 @@ public class MainApp extends Application {
 
             alert.showAndWait();
         }
-        catch (IOException e)
-        {
-            ShowAlert.IOAlert(primaryStage);
+        catch (IOException e) {
+	        AlertUtils.showErrorAlert(primaryStage, HEADER_TEXT, CONTENT_TEXT);
         }
 
         this.primaryStage = primaryStage;
@@ -75,16 +73,14 @@ public class MainApp extends Application {
 	/**
      * Initializes the root layout.
      */
-	private void initRootLayout()
-	{
+	private void initRootLayout() {
         // Load root layout from fxml file.
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
         try {
             rootLayout = loader.load();
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -102,10 +98,8 @@ public class MainApp extends Application {
 	/**
      * Відображаємо NewsOverview всередині RootLayout
      */
-	private void showNewsOverview()
-	{
-		try
-		{
+	private void showNewsOverview() {
+		try {
 			 // Load news overview.
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/NewsOverview.fxml"));
@@ -117,8 +111,7 @@ public class MainApp extends Application {
 			controllerNewsOverview = loader.getController();
 			controllerNewsOverview.setMainApp(this);
 		}
-		catch (IOException e)
-		{
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -127,8 +120,7 @@ public class MainApp extends Application {
      * Returns the main stage.
      * @return Return the main stage
      */
-	public Stage getPrimaryStage()
-	{
+	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
 
@@ -143,10 +135,8 @@ public class MainApp extends Application {
 	/**
 	 * Показуємо вікно додавання нової новини
 	 */
-	public void showNewsAddDialogNew()
-	{
-		try
-		{
+	public void showNewsAddDialogNew() {
+		try {
 			FXMLLoader loader = new FXMLLoader();
 	        loader.setLocation(MainApp.class.getResource("view/NewsEditDialog.fxml"));
 	        AnchorPane page = loader.load();
@@ -167,8 +157,7 @@ public class MainApp extends Application {
 	        // Show the dialog and wait until the user closes it
 	        dialogStage.showAndWait();
 	    }
-		catch (IOException e)
-		{
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -177,10 +166,8 @@ public class MainApp extends Application {
 	 * Показуємо вікно редгування новини
 	 * @param news передаємо обєкт у метод відображення для ініціалізації текстових полів
      */
-	public void showNewsAddDialogEdit(News news)
-	{
-		try
-		{
+	public void showNewsAddDialogEdit(News news) {
+		try {
 			FXMLLoader loader = new FXMLLoader();
 	        loader.setLocation(MainApp.class.getResource("view/NewsEditDialog.fxml"));
 	        AnchorPane page = loader.load();
@@ -206,8 +193,7 @@ public class MainApp extends Application {
 	        // Show the dialog and wait until the user closes it
 	        dialogStage.showAndWait();
 	    }
-		catch (IOException e)
-		{
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -215,19 +201,15 @@ public class MainApp extends Application {
 	/**
 	 * Очищаємо колецію і наповнюємо її новленими даними
 	 */
-	public void clearData()
-	{
+	public void clearData() {
 		this.newsData.removeAll(newsData);
 	}
 
-	public void getData()
-	{
-		try
-		{
+	public void getData() {
+		try {
 			this.newsData = INSTANCE_DB_MANAGER.getNews();
 		}
-		catch (SQLException e)
-		{
+		catch (SQLException e) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(primaryStage);
 			alert.setTitle("AMNews");
@@ -236,9 +218,8 @@ public class MainApp extends Application {
 
 			alert.showAndWait();
 		}
-		catch (IOException e)
-		{
-			ShowAlert.IOAlert(primaryStage);
+		catch (IOException e) {
+            AlertUtils.showErrorAlert(primaryStage, HEADER_TEXT, CONTENT_TEXT);
 		}
 	}
 }

@@ -13,8 +13,7 @@ import javafx.scene.control.Alert.AlertType;
 public class RootLayoutController {
 	private MainApp mainApp;
 	
-	public void setMainApp(MainApp mainApp)
-	{
+	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
     }
 
@@ -22,8 +21,7 @@ public class RootLayoutController {
 	 * Пункт меню Вихід
 	 */
 	@FXML
-    private void handleExit()
-	{
+    private void handleExit() {
         System.exit(0);
     }
 
@@ -31,8 +29,7 @@ public class RootLayoutController {
 	 * Пункт меню Про
 	 */
 	@FXML
-    private void handleAbout()
-	{
+    private void handleAbout() {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("AMNews");
         alert.setHeaderText("Про продукт");
@@ -45,8 +42,7 @@ public class RootLayoutController {
 	 * Пункт меню Додати
 	 */
 	@FXML
-	private void handleNewNews()
-	{
+	private void handleNewNews() {
 		mainApp.showNewsAddDialogNew();
 	}
 	

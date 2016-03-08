@@ -20,15 +20,33 @@ public class DBManager {
 	
 	private static DBManager instance;
 	
-	private DBManager()
-	{
-		
+	private DBManager() {
+        Properties props = new Properties();
+
+        final String sFileName = "database.properties";
+        String sDirSeparator = System.getProperty("file.separator");
+        File currentDir = new File(".");
+        try{
+            String sFilePath = currentDir.getCanonicalPath() + sDirSeparator + sFileName;
+            try (InputStream in = new BufferedInputStream(new FileInputStream(sFilePath))) {
+                    props.load(in);
+                }
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        String driver = props.getProperty("jdbc.drivers");
+        if (driver != null)
+            System.setProperty("jdbc.drivers", driver);
+        url = props.getProperty("jdbc.url");
+        username = props.getProperty("jdbc.username");
+        password = props.getProperty("jdbc.password");
 	}
 	
-	 public static DBManager getInstance()
-	 {
-		 if(instance == null)
-		 {
+	 public static DBManager getInstance() {
+		 if(instance == null) {
 			 instance = new DBManager();
 		 }
 		 
@@ -45,26 +63,8 @@ public class DBManager {
 	 * @throws IOException	зчитування  з файлу
 	 * @throws SQLException	помилки роботи з базою
      */
-	private Connection ConnectionToDB() throws IOException, SQLException {
+	private Connection getConnectionToDB() throws IOException, SQLException {
 		Connection connect;
-		Properties props = new Properties();
-
-		final String sFileName = "database.properties";
-		String sDirSeparator = System.getProperty("file.separator");
-		File currentDir = new File(".");
-		String sFilePath = currentDir.getCanonicalPath() + sDirSeparator + sFileName;
-
-		try (InputStream in = new BufferedInputStream(new FileInputStream(sFilePath)))
-		{
-			props.load(in);
-		}
-
-		String driver = props.getProperty("jdbc.drivers");
-		if (driver != null)
-			System.setProperty("jdbc.drivers", driver);
-		url = props.getProperty("jdbc.url");
-		username = props.getProperty("jdbc.username");
-		password = props.getProperty("jdbc.password");
 
 		connect = DriverManager.getConnection(url, username, password);
         connect.setAutoCommit(false);
@@ -78,11 +78,10 @@ public class DBManager {
 	 * @throws SQLException	помилки роботи з базою
 	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
      */
-	public ObservableList<News> getNews() throws SQLException, IOException
-	{
+	public ObservableList<News> getNews() throws SQLException, IOException {
 		ObservableList<News> newsData = FXCollections.observableArrayList();
 		Statement stmt;
-		Connection connect = ConnectionToDB();
+		Connection connect = getConnectionToDB();
 		
 		try {
 			stmt = connect.createStatement();
@@ -114,15 +113,14 @@ public class DBManager {
 	 * @throws SQLException	помилки роботи з базою
 	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
      */
-	public void addRecord (News aNews) throws SQLException, IOException
-	{
+	public void addRecord (News aNews) throws SQLException, IOException {
 		Statement stmt;
 		PreparedStatement stat;
 		final String insertQuery =
 				"INSERT INTO \"News\" (subject, text_presenter, text_news, created_date, last_modified_date)"
 				+ "VALUES (?, ?, ?, ?, ?)";
 
-		Connection connect = ConnectionToDB();
+		Connection connect = getConnectionToDB();
 
 		try{
 			stmt = connect.createStatement();
@@ -138,9 +136,9 @@ public class DBManager {
 			stmt.close();
 			connect.commit();
 		}
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             connect.rollback();
+            throw e;
         }
 		finally {
 			if (connect != null)
@@ -154,8 +152,7 @@ public class DBManager {
 	 * @throws SQLException	помилки роботи з базою
 	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
      */
-	public void updateRecord (News aNews) throws SQLException, IOException
-	{
+	public void updateRecord (News aNews) throws SQLException, IOException {
 		Statement stmt;
 		PreparedStatement stat;
 		final String updateQuery =
@@ -163,10 +160,9 @@ public class DBManager {
 				+ "created_date = ?, last_modified_date = ? "
 				+ "where id = ?";
 
-        Connection connect = ConnectionToDB();
+        Connection connect = getConnectionToDB();
 
-        try
-        {
+        try {
 			stmt = connect.createStatement();
 				
 			stat = connect.prepareStatement(updateQuery);
@@ -181,9 +177,9 @@ public class DBManager {
 			stmt.close();
 			connect.commit();
 		}
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             connect.rollback();
+            throw e;
         }
         finally {
             if (connect != null)
@@ -197,16 +193,14 @@ public class DBManager {
 	 * @throws SQLException	помилки роботи з базою
 	 * @throws IOException	зчитування  з файлу (бо юзається метод ConnectionToDB())
      */
-	public void deleteRecord (News aNews) throws SQLException, IOException
-	{
+	public void deleteRecord (News aNews) throws SQLException, IOException {
 		Statement stmt;
 		PreparedStatement stat;
 		final String deleteQuery = "DELETE from \"News\" where id = ?";
 
-        Connection connect = ConnectionToDB();
+        Connection connect = getConnectionToDB();
 
-        try
-        {
+        try {
 			stmt = connect.createStatement();
 
 			stat = connect.prepareStatement(deleteQuery);
@@ -216,8 +210,7 @@ public class DBManager {
 			stmt.close();
 			connect.commit();
 		}
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             connect.rollback();
         }
         finally {
@@ -233,25 +226,22 @@ public class DBManager {
 	 * @throws SQLException
 	 * @throws IOException
      */
-	public ObservableList<News> filterNews (LocalDate date) throws SQLException, IOException
-	{
+	public ObservableList<News> filterNews (LocalDate date) throws SQLException, IOException {
 		ObservableList<News> newsData = FXCollections.observableArrayList();
 		
 		PreparedStatement stat;
 		final String filterQuery = "SELECT * FROM \"News\" WHERE "
 				+ "created_date::date = ?";
 
-        Connection connect = ConnectionToDB();
+        Connection connect = getConnectionToDB();
 
-        try
-        {
+        try {
 			stat = connect.prepareStatement(filterQuery);
 			stat.setDate(1, Date.valueOf(date));
 			
 			ResultSet rs = stat.executeQuery();
 			
-			while (rs.next())
-			{
+			while (rs.next()) {
 				int id = rs.getInt("id");
 				String subject = rs.getString("subject");
 				String textPresenter = rs.getString("text_presenter");
